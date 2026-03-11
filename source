@@ -43,6 +43,11 @@ local scripts = {
         Name = "God_Mode.lua",
         Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/God_Mode.lua",
         Description = "it is a beta version"
+    },
+    {
+        Name = "NexusRemoteTunner.lua"
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/NexusRemoteTunner.lua"
+        Description = "Nexus helps you execute script on the selected remote event using the Advanced Executor"
     }
 }
 
@@ -73,4 +78,5 @@ for _, script in ipairs(scripts) do
             loadstring(content)()
         end
     })
+
 end
