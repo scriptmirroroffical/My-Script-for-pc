@@ -105,7 +105,7 @@ end
 
 createInput("Walk Speed", stats.speed, 50)
 createInput("Jump Power", stats.jump, 100)
-createInput("Health (Bypass)", stats.health, 150)
+createInput("Health (Bypass BETA-v1)", stats.health, 150)
 createInput("Fly Speed", stats.flySpeed, 200)
 
 -- NÚT NOCLIP (ĐÃ FIX)
@@ -241,4 +241,5 @@ RunService.Heartbeat:Connect(function()
 end)
 
 print("⚡ Stats Controller V7.1 Loaded! NoClip is now toggleable.")
+
 
