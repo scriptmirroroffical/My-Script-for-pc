@@ -1,5 +1,5 @@
 -- ==========================================
--- NEXUS ADVANCED REMOTE TUNER v2.4 (Spy & Block)
+-- NEXUS ADVANCED REMOTE TUNER v2.5 (Spy, Block & SS Scan)
 -- ==========================================
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -11,8 +11,22 @@ local cachedRemotes = {}
 local blockedRemotes = {}
 local isSpying = false
 
+local backdoorKeywords = {"execute", "run", "loadstring", "serverside", "console", "f_exec", "backdoor", "nexus_ss", "metability"}
+
 local guiParent = (pcall(function() return CoreGui.Name end) and CoreGui) or player:WaitForChild("PlayerGui")
 if guiParent:FindFirstChild("NexusAdvanced") then guiParent.NexusAdvanced:Destroy() end
+
+-- Helper: Xem nội dung Table
+local function serializeTable(val)
+    if type(val) == "table" then
+        local res = "{"
+        for k, v in pairs(val) do
+            res = res .. tostring(k) .. "=" .. serializeTable(v) .. ","
+        end
+        return res:sub(1, #res - 1) .. "}"
+    end
+    return tostring(val)
+end
 
 -- ==========================================
 -- 1. UI SETUP
@@ -39,7 +53,7 @@ Instance.new("UICorner", header).CornerRadius = UDim.new(0, 8)
 local title = Instance.new("TextLabel", header)
 title.Size = UDim2.new(1, -110, 1, 0)
 title.Position = UDim2.new(0, 15, 0, 0)
-title.Text = "NEXUS ADVANCED TUNER v2.4"
+title.Text = "NEXUS ADVANCED v2.5 [SS SCAN]"
 title.TextColor3 = Color3.fromRGB(0, 255, 170)
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
@@ -50,43 +64,33 @@ closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -40, 0, 5)
 closeBtn.Text = "X"
 closeBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", closeBtn)
-
-local minBtn = Instance.new("TextButton", header)
-minBtn.Size = UDim2.new(0, 30, 0, 30)
-minBtn.Position = UDim2.new(1, -75, 0, 5)
-minBtn.Text = "-"
-minBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
-minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", minBtn)
 
 -- Container
 local container = Instance.new("Frame", main)
--- FIX: Changed Y scale from (1, -40) to a fixed absolute height of 460 (500 total - 40 header).
--- This stops the bottom buttons from flying upwards when the main frame shrinks!
 container.Size = UDim2.new(1, 0, 0, 460) 
 container.Position = UDim2.new(0, 0, 0, 40)
 container.BackgroundTransparency = 1
 
--- Left Panel (Search & List)
+-- Left Panel
 local searchBox = Instance.new("TextBox", container)
-searchBox.Size = UDim2.new(0.4, -35, 0, 30)
+searchBox.Size = UDim2.new(0.4, -70, 0, 30)
 searchBox.Position = UDim2.new(0, 10, 0, 10)
-searchBox.PlaceholderText = "Search Remotes..."
+searchBox.PlaceholderText = "Search..."
 searchBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 searchBox.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", searchBox)
 
-local refreshBtn = Instance.new("TextButton", container)
-refreshBtn.Size = UDim2.new(0, 30, 0, 30)
-refreshBtn.Position = UDim2.new(0.4, -20, 0, 10)
-refreshBtn.Text = "↻"
-refreshBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
-refreshBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", refreshBtn)
+local scanBtn = Instance.new("TextButton", container)
+scanBtn.Size = UDim2.new(0, 60, 0, 30)
+scanBtn.Position = UDim2.new(0.4, -55, 0, 10)
+scanBtn.Text = "SCAN SS"
+scanBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+scanBtn.TextColor3 = Color3.new(1, 1, 1)
+scanBtn.Font = Enum.Font.GothamBold
+scanBtn.TextSize = 10
+Instance.new("UICorner", scanBtn)
 
 local listScroll = Instance.new("ScrollingFrame", container)
 listScroll.Size = UDim2.new(0.4, 0, 1, -60)
@@ -96,7 +100,7 @@ listScroll.BorderSizePixel = 0
 Instance.new("UICorner", listScroll)
 local listLayout = Instance.new("UIListLayout", listScroll)
 
--- Right Panel (Console, Spy, Block)
+-- Right Panel
 local consoleFrame = Instance.new("Frame", container)
 consoleFrame.Size = UDim2.new(0.6, -20, 1, -20)
 consoleFrame.Position = UDim2.new(0.4, 10, 0, 10)
@@ -115,32 +119,27 @@ spyToggleBtn.Position = UDim2.new(0.7, 5, 0, 0)
 spyToggleBtn.Text = "SPY: OFF"
 spyToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 spyToggleBtn.TextColor3 = Color3.new(1, 1, 1)
-spyToggleBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", spyToggleBtn)
 
 local argBox = Instance.new("TextBox", consoleFrame)
-argBox.Size = UDim2.new(1, 0, 0, 130)
+argBox.Size = UDim2.new(1, 0, 0, 120)
 argBox.Position = UDim2.new(0, 0, 0, 40)
 argBox.MultiLine = true
-argBox.Text = "1, \"Sword\""
+argBox.Text = "print('Nexus Connected')"
 argBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 argBox.TextColor3 = Color3.fromRGB(0, 255, 0)
 argBox.Font = Enum.Font.Code
 argBox.TextXAlignment = 0
 argBox.TextYAlignment = 0
-argBox.ClearTextOnFocus = false
 Instance.new("UICorner", argBox)
 
 local logScroll = Instance.new("ScrollingFrame", consoleFrame)
-logScroll.Size = UDim2.new(1, 0, 0, 160)
-logScroll.Position = UDim2.new(0, 0, 0, 180)
+logScroll.Size = UDim2.new(1, 0, 0, 170)
+logScroll.Position = UDim2.new(0, 0, 0, 170)
 logScroll.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-logScroll.BorderSizePixel = 0
-logScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 logScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 Instance.new("UICorner", logScroll)
 local logLayout = Instance.new("UIListLayout", logScroll)
-logLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local fireBtn = Instance.new("TextButton", consoleFrame)
 fireBtn.Size = UDim2.new(0.5, -5, 0, 40)
@@ -148,23 +147,19 @@ fireBtn.Position = UDim2.new(0, 0, 1, -40)
 fireBtn.Text = "EXECUTE"
 fireBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
 fireBtn.TextColor3 = Color3.new(1, 1, 1)
-fireBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", fireBtn)
 
 local blockBtn = Instance.new("TextButton", consoleFrame)
 blockBtn.Size = UDim2.new(0.5, -5, 0, 40)
 blockBtn.Position = UDim2.new(0.5, 5, 1, -40)
-blockBtn.Text = "BLOCK TARGET"
+blockBtn.Text = "BLOCK"
 blockBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 blockBtn.TextColor3 = Color3.new(1, 1, 1)
-blockBtn.Font = Enum.Font.GothamBold
 Instance.new("UICorner", blockBtn)
 
 -- ==========================================
 -- LOGIC
 -- ==========================================
-
--- UI Helpers
 local function logSpy(message, color)
     local msgLabel = Instance.new("TextLabel", logScroll)
     msgLabel.Size = UDim2.new(1, -10, 0, 20)
@@ -173,25 +168,11 @@ local function logSpy(message, color)
     msgLabel.TextColor3 = color or Color3.fromRGB(200, 200, 200)
     msgLabel.Font = Enum.Font.Code
     msgLabel.TextSize = 12
-    msgLabel.TextXAlignment = Enum.TextXAlignment.Left
+    msgLabel.TextXAlignment = 0
     msgLabel.TextWrapped = true
     msgLabel.AutomaticSize = Enum.AutomaticSize.Y
 end
 
--- Minimize
-local isMinimized = false
-local originalSize = UDim2.new(0, 650, 0, 500)
-local minimizedSize = UDim2.new(0, 650, 0, 40)
-
-minBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    local targetSize = isMinimized and minimizedSize or originalSize
-    local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    TweenService:Create(main, tweenInfo, {Size = targetSize}):Play()
-    minBtn.Text = isMinimized and "+" or "-"
-end)
-
--- List Updating
 local function refreshCache()
     table.clear(cachedRemotes)
     for _, obj in pairs(game:GetDescendants()) do
@@ -206,94 +187,86 @@ local function updateList()
         if obj.Parent and (filter == "" or obj.Name:lower():find(filter)) then
             local b = Instance.new("TextButton", listScroll)
             b.Size = UDim2.new(1, 0, 0, 25)
-            
-            local prefix = blockedRemotes[obj] and "[B] " or " "
-            b.Text = prefix .. obj.Name
-            
+            b.Text = (blockedRemotes[obj] and "[B] " or "") .. obj.Name
             b.BackgroundColor3 = blockedRemotes[obj] and Color3.fromRGB(80, 20, 20) or Color3.fromRGB(35, 35, 35)
             b.TextColor3 = Color3.new(0.8, 0.8, 0.8)
             Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
             b.MouseButton1Click:Connect(function()
                 selectedRemote = obj
                 targetDisplay.Text = "TARGET: " .. obj.Name
-                blockBtn.Text = blockedRemotes[obj] and "UNBLOCK" or "BLOCK TARGET"
-                blockBtn.BackgroundColor3 = blockedRemotes[obj] and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(80, 80, 80)
             end)
         end
     end
 end
 
--- Execute Logic
+-- SS SCAN LOGIC
+scanBtn.MouseButton1Click:Connect(function()
+    logSpy("--- SCANNING FOR BACKDOORS ---", Color3.fromRGB(255, 165, 0))
+    refreshCache()
+    local found = 0
+    for _, v in pairs(cachedRemotes) do
+        local isSus = false
+        for _, key in pairs(backdoorKeywords) do
+            if v.Name:lower():find(key) then isSus = true break end
+        end
+        if isSus or v:IsDescendantOf(game:GetService("JointsService")) then
+            found = found + 1
+            logSpy("[!] POTENTIAL: " .. v.Name, Color3.fromRGB(255, 50, 50))
+            selectedRemote = v
+            targetDisplay.Text = "TARGET: " .. v.Name
+        end
+    end
+    if found == 0 then logSpy("No obvious backdoors found.", Color3.fromRGB(150, 150, 150)) end
+end)
+
+-- HOOKING
+if hookmetamethod then
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        if (method == "FireServer" or method == "InvokeServer") and not checkcaller() then
+            if blockedRemotes[self] then return end
+            if isSpying then
+                local args = {...}
+                local argStr = ""
+                for i, v in ipairs(args) do
+                    argStr = argStr .. serializeTable(v) .. (i < #args and ", " or "")
+                end
+                task.defer(function() logSpy(self.Name .. " | Args: {" .. argStr .. "}", Color3.fromRGB(150, 200, 255)) end)
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+end
+
+-- EXECUTE & OTHER BTNS
 fireBtn.MouseButton1Click:Connect(function()
     if not selectedRemote then return end
-    local success, func = pcall(function() return loadstring("return {" .. argBox.Text .. "}") end)
+    local code = "return " .. argBox.Text
+    local success, func = pcall(loadstring, code)
     if success and type(func) == "function" then
-        local args = {func()}
         pcall(function()
-            if selectedRemote:IsA("RemoteEvent") then selectedRemote:FireServer(unpack(args))
-            else print("Server Res:", selectedRemote:InvokeServer(unpack(args))) end
+            if selectedRemote:IsA("RemoteEvent") then selectedRemote:FireServer(func())
+            else selectedRemote:InvokeServer(func()) end
             logSpy("-> FIRED: " .. selectedRemote.Name, Color3.fromRGB(0, 255, 0))
         end)
     end
 end)
 
--- Spy & Block Toggles
 spyToggleBtn.MouseButton1Click:Connect(function()
     isSpying = not isSpying
     spyToggleBtn.Text = isSpying and "SPY: ON" or "SPY: OFF"
     spyToggleBtn.BackgroundColor3 = isSpying and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(50, 50, 50)
-    if isSpying then logSpy("--- SPY ENABLED ---", Color3.fromRGB(255, 255, 0)) end
 end)
 
 blockBtn.MouseButton1Click:Connect(function()
-    if not selectedRemote then return end
-    if blockedRemotes[selectedRemote] then
-        blockedRemotes[selectedRemote] = nil
-        blockBtn.Text = "BLOCK TARGET"
-        blockBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        logSpy("Unblocked: " .. selectedRemote.Name, Color3.fromRGB(150, 150, 150))
-    else
-        blockedRemotes[selectedRemote] = true
-        blockBtn.Text = "UNBLOCK"
-        blockBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        logSpy("BLOCKED: " .. selectedRemote.Name, Color3.fromRGB(255, 100, 100))
+    if selectedRemote then 
+        blockedRemotes[selectedRemote] = not blockedRemotes[selectedRemote]
+        updateList()
     end
-    updateList()
 end)
 
--- Hooking Logic
-if hookmetamethod then
-    local oldNamecall
-    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-        local method = getnamecallmethod()
-        
-        if method == "FireServer" or method == "InvokeServer" then
-            if blockedRemotes[self] then
-                return 
-            end
-            
-            if isSpying and not checkcaller() then
-                local args = {...}
-                local argString = ""
-                for i, v in ipairs(args) do
-                    argString = argString .. tostring(v) .. (i < #args and ", " or "")
-                end
-                task.defer(function()
-                    logSpy(self.Name .. " | Args: {" .. argString .. "}", Color3.fromRGB(150, 200, 255))
-                end)
-            end
-        end
-        
-        return oldNamecall(self, ...)
-    end)
-else
-    warn("Your executor does not support hookmetamethod! Spy and Block will not function.")
-    logSpy("ERROR: hookmetamethod not supported by executor.", Color3.fromRGB(255, 0, 0))
-end
-
--- Init
 searchBox:GetPropertyChangedSignal("Text"):Connect(updateList)
-refreshBtn.MouseButton1Click:Connect(function() refreshCache() updateList() end)
 closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
 refreshCache()
