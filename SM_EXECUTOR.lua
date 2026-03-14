@@ -101,7 +101,7 @@ output.BackgroundColor3 = Color3.new()
 output.Position = UDim2.new(0.523, 0, 0.101, 0)
 output.BorderColor3 = Color3.new()
 output.BorderSizePixel = 0
-output.Size = UDim2.new(0, 507, 0, 517)
+output.Size = UDim2.new(0, 507, 0, 580)
 output.Parent = screenGui
 
 local uICorner_6 = Instance.new("UICorner")
@@ -126,12 +126,13 @@ output_2.Name = "TextInside"
 output_2.FontFace = Font.new("rbxasset://fonts/families/JosefinSans.json")
 output_2.TextColor3 = Color3.new()
 output_2.Text = "Welcome to SM Executor"
+output_2.RichText = true 
 output_2.BackgroundTransparency = 1
 output_2.BorderSizePixel = 0
 output_2.TextWrapped = true
 output_2.TextXAlignment = Enum.TextXAlignment.Left
 output_2.TextYAlignment = Enum.TextYAlignment.Top
-output_2.TextSize = 35
+output_2.TextSize = 18
 output_2.Size = UDim2.new(1, -10, 0, 500) -- rộng bằng ScrollingFrame, trừ đi chút cho scrollbar
 output_2.Position = UDim2.new(0, 5, 0, 0)
 output_2.Parent = backout_2
@@ -219,22 +220,22 @@ uICorner_11.CornerRadius = UDim.new(1, 0)
 uICorner_11.Parent = textButton
 
 local textButton_2 = Instance.new("TextButton")
-textButton_2.Name = "TextButton"
+textButton_2.Name = "TextButton_2"
+textButton_2.TextWrapped = true
+textButton_2.TextColor3 = Color3.new()
+textButton_2.BorderColor3 = Color3.new()
+textButton_2.Text = "Scan SS"
+textButton_2.BackgroundColor3 = Color3.new(1, 0.333, 0)
+textButton_2.BorderSizePixel = 0
+textButton_2.Position = UDim2.new(0.209, 0, 0.881, 0)
+textButton_2.TextScaled = true
 textButton_2.FontFace = Font.new(
 	"rbxasset://fonts/families/PatrickHand.json",
 	Enum.FontWeight.Bold,
-	Enum.FontStyle.Normal
+	Enum.FontStyle.Italic
 )
-textButton_2.TextColor3 = Color3.new()
-textButton_2.Text = "SCAN SS"
-textButton_2.BackgroundColor3 = Color3.new(1, 0, 0)
-textButton_2.TextScaled = true
-textButton_2.BorderSizePixel = 0
-textButton_2.Position = UDim2.new(0.28, 0, 0.882, 0)
-textButton_2.TextWrapped = true
-textButton_2.BorderColor3 = Color3.new()
 textButton_2.TextSize = 14
-textButton_2.Size = UDim2.new(0, 200, 0, 50)
+textButton_2.Size = UDim2.new(0, 142, 0, 50)
 textButton_2.Parent = mainExec
 
 local uICorner_12 = Instance.new("UICorner")
@@ -242,24 +243,53 @@ uICorner_12.Name = "UICorner"
 uICorner_12.CornerRadius = UDim.new(1, 0)
 uICorner_12.Parent = textButton_2
 
+local resetModeBtn = Instance.new("TextButton")
+resetModeBtn.Name = "resetModeBtn"
+resetModeBtn.TextWrapped = true
+resetModeBtn.TextColor3 = Color3.new()
+resetModeBtn.BorderColor3 = Color3.new()
+resetModeBtn.Text = "Return to cilent"
+resetModeBtn.BackgroundColor3 = Color3.new(0.667, 0.667, 1)
+resetModeBtn.BorderSizePixel = 0
+resetModeBtn.Position = UDim2.new(0.39, 0, 0.881, 0)
+resetModeBtn.TextScaled = true
+resetModeBtn.FontFace = Font.new(
+	"rbxasset://fonts/families/PatrickHand.json",
+	Enum.FontWeight.Bold,
+	Enum.FontStyle.Italic
+)
+resetModeBtn.TextSize = 14
+resetModeBtn.Size = UDim2.new(0, 133, 0, 50)
+resetModeBtn.Parent = mainExec
+
+local uICorner = Instance.new("UICorner")
+uICorner.Name = "UICorner"
+uICorner.CornerRadius = UDim.new(1, 0)
+uICorner.Parent = resetModeBtn
+
 local eXECButton = Instance.new("TextButton")
 eXECButton.Name = "EXECButton"
 eXECButton.TextWrapped = true
 eXECButton.TextColor3 = Color3.new()
+eXECButton.Parent = mainExec
+eXECButton.BorderColor3 = Color3.new()
 eXECButton.Text = "EXECUTE"
 eXECButton.BackgroundColor3 = Color3.new(0, 0.667, 1)
 eXECButton.BorderSizePixel = 0
-eXECButton.TextScaled = true
 eXECButton.Position = UDim2.new(0.0327, 0, 0.881, 0)
+eXECButton.TextScaled = true
 eXECButton.FontFace = Font.new(
 	"rbxasset://fonts/families/PatrickHand.json",
 	Enum.FontWeight.Bold,
 	Enum.FontStyle.Normal
 )
-eXECButton.BorderColor3 = Color3.new()
 eXECButton.TextSize = 14
-eXECButton.Size = UDim2.new(0, 200, 0, 50)
-eXECButton.Parent = mainExec
+eXECButton.Size = UDim2.new(0, 142, 0, 50)
+
+local uICorner = Instance.new("UICorner")
+uICorner.Name = "UICorner"
+uICorner.CornerRadius = UDim.new(1, 0)
+uICorner.Parent = eXECButton
 
 local uICorner_13 = Instance.new("UICorner")
 uICorner_13.Name = "UICorner"
@@ -321,6 +351,50 @@ imageLabel_3.Position = UDim2.new(-0.124, 0, -0.0123, 0)
 imageLabel_3.BorderSizePixel = 0
 imageLabel_3.Size = UDim2.new(0, 196, 0, 165)
 imageLabel_3.Parent = lOGO_WHEN_ATTACHED
+
+local clearlog = Instance.new("TextButton")
+clearlog.Name = "Clearlog"
+clearlog.TextWrapped = true
+clearlog.TextColor3 = Color3.new()
+clearlog.BorderColor3 = Color3.new()
+clearlog.Text = "Clear Log"
+clearlog.BackgroundColor3 = Color3.new(0.455, 0.455, 0.455)
+clearlog.BorderSizePixel = 0
+clearlog.Position = UDim2.new(0.0217, 0, 0.901, 0)
+clearlog.TextScaled = true
+clearlog.FontFace = Font.new(
+	"rbxasset://fonts/families/PatrickHand.json",
+	Enum.FontWeight.Bold,
+	Enum.FontStyle.Normal
+)
+clearlog.TextSize = 14
+clearlog.Size = UDim2.new(0, 200, 0, 50)
+clearlog.Parent = output
+
+local spyBtn = Instance.new("TextButton")
+spyBtn.Name = "spyBtn"
+spyBtn.TextWrapped = true
+spyBtn.TextColor3 = Color3.new()
+spyBtn.BorderColor3 = Color3.new()
+spyBtn.Text = "Remote Spy"
+spyBtn.BackgroundColor3 = Color3.new(0.82, 0, 0)
+spyBtn.BorderSizePixel = 0
+spyBtn.Position = UDim2.new(0.582, 0, 0.901, 0)
+spyBtn.TextScaled = true
+spyBtn.FontFace = Font.new(
+	"rbxasset://fonts/families/PatrickHand.json",
+	Enum.FontWeight.Bold,
+	Enum.FontStyle.Normal
+)
+spyBtn.TextSize = 14
+spyBtn.Size = UDim2.new(0, 200, 0, 50)
+
+local uICorneruiorent = Instance.new("UICorner")
+uICorneruiorent = spyBtn
+
+local uICorner = Instance.new("UICorner")
+uICorner.Name = "UICorner"
+uICorner.Parent = clearlog
 
 local camera = workspace.CurrentCamera
 local masterFrame = script.Parent
@@ -431,13 +505,13 @@ local function logMessage(text, colorType)
 end
 
 -- ==========================================
--- HỆ THỐNG KÉO THẢ TỐI ƯU (SMOOTH DRAG)
+-- HỆ THỐNG KÉO THẢ TỐI ƯU (FIXED & SMOOTH)
 -- ==========================================
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
-	-- Kiểm tra nếu người dùng bỏ trống attachedObjects nhưng lại nhập lerpSpeed
+	-- Xử lý tham số linh hoạt
 	if type(attachedObjects) == "number" then
 		lerpSpeed = attachedObjects
 		attachedObjects = {}
@@ -450,23 +524,31 @@ local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
 	local dragInput
 	local dragStart
 	local startPositions = {}
-	local targetPositions = {}
+	local currentTargets = {} -- Lưu vị trí đích thực tế
+
+	-- Khởi tạo vị trí đích ban đầu
+	currentTargets[mainFrame] = mainFrame.Position
+	for _, obj in ipairs(attachedObjects) do
+		currentTargets[obj] = obj.Position
+	end
 
 	local function update(input)
 		local delta = input.Position - dragStart
 
-		-- Tính toán vị trí cho Frame chính
+		-- Tính toán vị trí đích cho Frame chính
 		local sPosMain = startPositions[mainFrame]
-		targetPositions[mainFrame] = UDim2.new(
-			sPosMain.X.Scale, sPosMain.X.Offset + delta.X, 
-			sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y
-		)
+		if sPosMain then
+			currentTargets[mainFrame] = UDim2.new(
+				sPosMain.X.Scale, sPosMain.X.Offset + delta.X, 
+				sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y
+			)
+		end
 
 		-- Tính toán cho các object đi kèm
 		for _, obj in ipairs(attachedObjects) do
 			local sPos = startPositions[obj]
 			if sPos then
-				targetPositions[obj] = UDim2.new(
+				currentTargets[obj] = UDim2.new(
 					sPos.X.Scale, sPos.X.Offset + delta.X, 
 					sPos.Y.Scale, sPos.Y.Offset + delta.Y
 				)
@@ -479,6 +561,7 @@ local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
 			dragging = true
 			dragStart = input.Position
 
+			-- Ghi lại vị trí bắt đầu của mọi thứ
 			startPositions[mainFrame] = mainFrame.Position
 			for _, obj in ipairs(attachedObjects) do
 				startPositions[obj] = obj.Position
@@ -506,30 +589,25 @@ local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
 		end
 	end)
 
+	-- Vòng lặp Lerp mượt mà
 	RunService.RenderStepped:Connect(function()
-		if dragging then
-			-- Chỉ Lerp khi đang kéo để tiết kiệm hiệu năng
-			mainFrame.Position = mainFrame.Position:Lerp(targetPositions[mainFrame], lerpSpeed)
-			for _, obj in ipairs(attachedObjects) do
-				if targetPositions[obj] then
-					obj.Position = obj.Position:Lerp(targetPositions[obj], lerpSpeed)
-				end
+		-- Luôn Lerp về vị trí đích (giúp hiệu ứng mượt hơn kể cả khi vừa thả tay)
+		mainFrame.Position = mainFrame.Position:Lerp(currentTargets[mainFrame], lerpSpeed)
+
+		for _, obj in ipairs(attachedObjects) do
+			if currentTargets[obj] then
+				obj.Position = obj.Position:Lerp(currentTargets[obj], lerpSpeed)
 			end
 		end
 	end)
 end
 
--- CÁCH SỬ DỤNG ĐÚNG:
--- Nếu bạn muốn kéo main mà exec và output đi theo:
+-- ==========================================
+-- CÁCH DÙNG (CHỈ GỌI 1 LẦN CHO NHÓM)
+-- ==========================================
+-- Giả sử 'main' là bảng điều khiển, 'exec' và 'output' đi theo nó:
+-- Bỏ các dòng cũ đi, chỉ dùng 1 dòng này:
 makeDraggableSmooth(main, {exec, output}, 0.2)
-makeDraggableSmooth(exec, 0.2)
-makeDraggableSmooth(output, 0.2)
-
--- ĐỪNG gọi thêm makeDraggableSmooth cho exec và output nếu chúng đã là con của main 
--- hoặc bạn đã khai báo chúng trong bảng attachedObjects ở trên.
--- Cách sử dụng:
--- Giả sử bạn có 'MainFrame', 'ExecFrame', 'OutputFrame'
--- makeDraggableSmooth(MainFrame, {ExecFrame, OutputFrame}, 0.2)
 
 -- ==========================================
 -- 4. QUẢN LÝ CỬA SỔ & HOẠT ẢNH
@@ -622,108 +700,195 @@ if textButton then
 	end)
 end
 
+-- Thêm biến trạng thái vào EngineState nếu chưa có
+EngineState.SSMode = false 
+
+-- ==========================================
+-- 1. LOGIC NÚT EXECUTE (HỢP NHẤT)
+-- ==========================================
 if eXECButton then
 	eXECButton.MouseButton1Click:Connect(function()
-		print("Nút đã được nhấn!") -- Debug
-
 		if not EngineState or not EngineState.IsAttached then 
 			logMessage("CRITICAL: Not attached!", Colors.Error) 
 			return 
 		end
 
 		local code = inputSctipt.Text
-		if code:gsub("%s+", "") == "" then -- Kiểm tra chuỗi trống thông minh hơn
+		if code:gsub("%s+", "") == "" then 
 			logMessage("Script is empty.", Colors.Warning) 
 			return 
 		end
 
-		logMessage("Executing payload...", Colors.Info)
-
-		task.spawn(function()
-			-- Một số executor dùng getgenv().loadstring hoặc tương tự
-			local executorLoadstring = loadstring or getgenv().loadstring 
-
-			if not executorLoadstring then 
-				logMessage("LỖI: Môi trường không hỗ trợ loadstring.", Colors.Error) 
-				return 
-			end
-
-			local func, syntaxErr = executorLoadstring(code)
-			if func then
-				local success, runtimeErr = pcall(func)
-				if success then 
-					logMessage("Execution Complete.", Colors.Success)
-				else 
-					logMessage("Runtime Error: " .. tostring(runtimeErr), Colors.Error) 
-				end
-			else
-				logMessage("Syntax Error: " .. tostring(syntaxErr), Colors.Error)
-			end
-		end)
-	end)
-else
-	warn("Không tìm thấy eXECButton!")
-end
-
-if execSSButton then
-	execSSButton.MouseButton1Click:Connect(function()
-		if not EngineState.IsAttached then logMessage("CRITICAL: Not attached!", Colors.Error) return end
-		local code = inputSctipt.Text
-		if code == "" then return end
-
-		logMessage("Attempting SS Execution...", Colors.System)
-		local foundSS = false
-
-		task.spawn(function()
-			for _, item in pairs(game:GetDescendants()) do
-				if _ % 100 == 0 then RunService.Heartbeat:Wait() end 
-
-				local isEvent = item:IsA("RemoteEvent")
-				local isFunc = item:IsA("RemoteFunction")
-
-				if isEvent or isFunc then
-					local name = item.Name:lower()
-					if name:find("runcode") or name:find("loadstring") or name:find("require") or name:find("execute") then
-						logMessage("Payload sent to Remote: " .. item.Name, Colors.Info)
-						pcall(function()
-							if isEvent then item:FireServer(code) else item:InvokeServer(code) end
-						end)
-						foundSS = true
+		-- KIỂM TRA CHẾ ĐỘ: Nếu đang là SSMode thì chạy vòng lặp Remote, ngược lại chạy Loadstring
+		if EngineState.SSMode then
+			logMessage("SS Execution: Bypassing via Remote...", Colors.System)
+			task.spawn(function()
+				local foundRemote = false
+				for _, item in pairs(game:GetDescendants()) do
+					if _ % 100 == 0 then RunService.Heartbeat:Wait() end 
+					if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
+						local name = item.Name:lower()
+						-- Các keyword backdoor phổ biến
+						if name:find("run") or name:find("load") or name:find("exec") or name:find("require") then
+							pcall(function()
+								if item:IsA("RemoteEvent") then item:FireServer(code) else item:InvokeServer(code) end
+							end)
+							foundRemote = true
+						end
 					end
 				end
-			end
-			if not foundSS then logMessage("SS Failed: No vulnerable Remotes found.", Colors.Error)
-			else logMessage("SS Execution sequence finished.", Colors.Success) end
-		end)
+				if foundRemote then logMessage("SS Payload Sent!", Colors.Success) 
+				else logMessage("SS Error: No vulnerable remotes found.", Colors.Error) end
+			end)
+		else
+			-- CHẾ ĐỘ BÌNH THƯỜNG (CLIENT)
+			logMessage("Executing locally...", Colors.Info)
+			task.spawn(function()
+				local executorLoadstring = loadstring or getgenv().loadstring 
+				if not executorLoadstring then
+					logMessage("ERROR: Environment not supported!", Colors.Error) 
+					return 
+				end
+
+				local func, syntaxErr = executorLoadstring(code)
+				if func then
+					local success, runtimeErr = pcall(func)
+					if success then logMessage("Execution Complete.", Colors.Success)
+					else logMessage("Runtime Error: " .. tostring(runtimeErr), Colors.Error) end
+				else
+					logMessage("Syntax Error: " .. tostring(syntaxErr), Colors.Error)
+				end
+			end)
+		end
 	end)
 end
 
+-- ==========================================
+-- ĐẤU NỐI LOGIC CHO NÚT BẤM (FIX LỖI PASTE)
+-- ==========================================
+
+-- 1. Cấu hình màu sắc và danh sách đen (Tránh bẫy HEX/Trap)
+local TrapKeywords = {"ban", "kick", "detect", "anticheat", "security", "log"}
+local SuccessColor = Color3.fromRGB(0, 255, 127)
+local ErrorColor = Color3.fromRGB(255, 65, 65)
+local WarningColor = Color3.fromRGB(255, 170, 0)
+
+-- 2. Logic cho nút SCAN SS (Biến: textButton_2)
 if textButton_2 then
 	textButton_2.MouseButton1Click:Connect(function()
-		logMessage("Deep Scan Initiated...", Colors.Warning)
+		-- Thông báo bắt đầu
+		logMessage("Deep Scan Initiated (Safety Mode: ON)...", WarningColor)
 		local foundCount = 0
-		local keywords = {"admin", "backdoor", "vulnerable", "loadstring", "require", "runcode", "execute", "servercmd"}
 
 		task.spawn(function()
+			-- Duyệt toàn bộ game để tìm Remote
 			for _, item in pairs(game:GetDescendants()) do
-				if _ % 100 == 0 then RunService.Heartbeat:Wait() end 
+				-- Tránh treo máy khi game quá nặng
+				if _ % 150 == 0 then game:GetService("RunService").Heartbeat:Wait() end 
 
 				if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
-					if item.Name ~= "CharacterSoundEvent" and item.Name ~= "DefaultServerSoundEvent" then
-						local name = item.Name:lower()
-						for _, word in ipairs(keywords) do
-							if name:find(word) then
-								logMessage("Threat: " .. item.Name .. " (Key: " .. word .. ")", Colors.Error)
-								print("Path: ", item:GetFullName())
-								foundCount = foundCount + 1
-								break
-							end
+					local name = item.Name:lower()
+					local isTrap = false
+
+					-- Kiểm tra xem có phải bẫy không
+					for _, word in ipairs(TrapKeywords) do
+						if name:find(word) then
+							isTrap = true
+							break
+						end
+					end
+
+					if isTrap then
+						logMessage("⚠️ TRAP DETECTED: " .. item.Name, ErrorColor)
+					else
+						-- Tìm kiếm backdoor thực sự (Run, Load, Execute, hoặc tên HEX/Rác)
+						if name:find("run") or name:find("load") or name:find("exec") or #name > 30 then
+							logMessage("✅ Vulnerable Found: " .. item.Name, SuccessColor)
+							foundCount = foundCount + 1
 						end
 					end
 				end
 			end
-			logMessage(foundCount > 0 and string.format("Scan Complete: %d threats found.", foundCount) or "Scan Complete: Clean.", foundCount > 0 and Colors.Error or Colors.Success)
+
+			-- Cập nhật trạng thái sau khi quét xong
+			if foundCount > 0 then
+				EngineState.SSMode = true
+				-- Đổi chữ nút Execute để báo hiệu
+				if eXECButton then
+					eXECButton.Text = "EXECUTE (SS MODE)"
+					eXECButton.BackgroundColor3 = Color3.fromRGB(170, 85, 255) -- Đổi sang màu tím
+				end
+				logMessage("Scan Complete: " .. foundCount .. " remotes verified safe.", SuccessColor)
+			else
+				logMessage("Scan Complete: No safe backdoors found.", WarningColor)
+			end
 		end)
+	end)
+else
+	warn("LỖI: Không tìm thấy biến 'textButton_2' để kết nối nút SCAN!")
+end
+
+-- 3. Logic cho nút EXECUTE (Biến: eXECButton)
+if eXECButton then
+	eXECButton.MouseButton1Click:Connect(function()
+		if not EngineState or not EngineState.IsAttached then 
+			logMessage("CRITICAL: Please ATTACH first!", ErrorColor)
+			return 
+		end
+
+		local code = inputSctipt.Text
+		if code:gsub("%s+", "") == "" then return end
+
+		if EngineState.SSMode then
+			logMessage("SS Execution: Infiltrating via Remotes...", Color3.fromRGB(0, 170, 255))
+			task.spawn(function()
+				for _, remote in pairs(game:GetDescendants()) do
+					if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
+						local n = remote.Name:lower()
+						-- Chỉ bắn vào những cái an toàn đã lọc
+						if (n:find("run") or n:find("load") or n:find("exec") or #n > 30) and not n:find("ban") then
+							pcall(function()
+								if remote:IsA("RemoteEvent") then 
+									remote:FireServer(code) 
+								else 
+									remote:InvokeServer(code) 
+								end
+							end)
+						end
+					end
+				end
+			end)
+		else
+			-- THAY THẾ DÒNG LỖI Ở ĐÂY:
+			local executorLoadstring = loadstring or getgenv().loadstring
+			if executorLoadstring then
+				local f, err = executorLoadstring(code) -- Đã xóa dấu = dư thừa
+				if f then 
+					local success, runtimeErr = pcall(f)
+					if success then
+						logMessage("Executed Successfully.", SuccessColor)
+					else
+						logMessage("Runtime Error: " .. tostring(runtimeErr), ErrorColor)
+					end
+				else 
+					logMessage("Syntax Error: " .. tostring(err), ErrorColor) 
+				end
+			else
+				logMessage("Environment not supported!", ErrorColor)
+			end
+		end
+	end)
+end
+
+-- ==========================================
+-- 3. NÚT RESET MODE (Đưa về trạng thái cũ)
+-- ==========================================
+if resetModeBtn then
+	resetModeBtn.MouseButton1Click:Connect(function()
+		EngineState.SSMode = false
+		eXECButton.Text = "EXECUTE"
+		eXECButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+		logMessage("Mode Reset: Back to local execution.", Colors.Info)
 	end)
 end
 
@@ -755,4 +920,56 @@ RunService.RenderStepped:Connect(function(dt)
 
 	-- Cập nhật vị trí (chỉ chạy vòng quanh, không xoay bản thân)
 	orbitCircle2.Position = UDim2.fromOffset(newX - orbitCircle2.Size.X.Offset/2, newY - orbitCircle2.Size.Y.Offset/2)
+end)
+
+-- ==========================================
+-- LOGIC CỐT LÕI: CLEAR LOGS
+-- ==========================================
+
+if clearlog then
+	clearlog.MouseButton1Click:Connect(function()
+		-- 1. Kiểm tra sự tồn tại của TextLabel hiển thị log
+		if output_2 then
+			-- Thực hiện hiệu ứng nháy nút khi bấm (Phản hồi thị giác)
+			local originalColor = clearlog.BackgroundColor3
+			clearlog.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+
+			-- Xóa nội dung văn bản
+			output_2.Text = ""
+
+			-- Reset biến đếm log trong EngineState để tránh lỗi tràn log cũ
+			if EngineState then
+				EngineState.LogCount = 0
+			end
+
+			-- 2. Cập nhật lại khung cuộn (ScrollingFrame)
+			if backout_2 then
+				-- Đưa thanh cuộn về vị trí trên cùng
+				backout_2.CanvasPosition = Vector2.new(0, 0)
+				-- Reset kích thước vùng chứa (CanvasSize) về mặc định
+				backout_2.CanvasSize = UDim2.new(0, 0, 0, 0)
+			end
+
+			-- 3. Thông báo log mới sau khi dọn dẹp
+			logMessage("System Log Cleared.", Colors.System)
+
+			-- Trả lại màu nút sau khi xử lý xong
+			task.wait(0.1)
+			clearlog.BackgroundColor3 = originalColor
+		else
+			warn("LỖI: Không tìm thấy output_2 để xóa log!")
+		end
+	end)
+end
+
+-- ==========================================
+-- TỐI ƯU HÓA TỰ ĐỘNG CUỘN (TÍCH HỢP)
+-- ==========================================
+-- Đảm bảo mỗi khi có log mới, thanh cuộn tự động nhảy xuống cuối
+output_2:GetPropertyChangedSignal("Text"):Connect(function()
+	if backout_2 then
+		-- Đợi 1 frame để Roblox tính toán lại TextBounds
+		RunService.Heartbeat:Wait() 
+		backout_2.CanvasPosition = Vector2.new(0, math.max(0, backout_2.AbsoluteCanvasSize.Y - backout_2.AbsoluteWindowSize.Y))
+	end
 end)
