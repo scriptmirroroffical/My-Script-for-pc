@@ -624,28 +624,45 @@ end
 
 if eXECButton then
 	eXECButton.MouseButton1Click:Connect(function()
-		if not EngineState.IsAttached then logMessage("CRITICAL: Not attached!", Colors.Error) return end
+		print("Nút đã được nhấn!") -- Debug
+
+		if not EngineState or not EngineState.IsAttached then 
+			logMessage("CRITICAL: Not attached!", Colors.Error) 
+			return 
+		end
 
 		local code = inputSctipt.Text
-		if code == "" or code == " " then logMessage("Script is empty.", Colors.Warning) return end
-
-		if EngineState.AutoExecEnabled then safeWriteFile(EngineState.AutoExecFile, code) end
+		if code:gsub("%s+", "") == "" then -- Kiểm tra chuỗi trống thông minh hơn
+			logMessage("Script is empty.", Colors.Warning) 
+			return 
+		end
 
 		logMessage("Executing payload...", Colors.Info)
+
 		task.spawn(function()
-			local executorLoadstring = loadstring
-			if not executorLoadstring then logMessage("Exploit lacks 'loadstring' support.", Colors.Error) return end
+			-- Một số executor dùng getgenv().loadstring hoặc tương tự
+			local executorLoadstring = loadstring or getgenv().loadstring 
+
+			if not executorLoadstring then 
+				logMessage("LỖI: Môi trường không hỗ trợ loadstring.", Colors.Error) 
+				return 
+			end
 
 			local func, syntaxErr = executorLoadstring(code)
 			if func then
 				local success, runtimeErr = pcall(func)
-				if success then logMessage("Execution Complete.", Colors.Success)
-				else logMessage("Runtime Error: " .. tostring(runtimeErr), Colors.Error) end
+				if success then 
+					logMessage("Execution Complete.", Colors.Success)
+				else 
+					logMessage("Runtime Error: " .. tostring(runtimeErr), Colors.Error) 
+				end
 			else
 				logMessage("Syntax Error: " .. tostring(syntaxErr), Colors.Error)
 			end
 		end)
 	end)
+else
+	warn("Không tìm thấy eXECButton!")
 end
 
 if execSSButton then
