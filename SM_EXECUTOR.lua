@@ -2,6 +2,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ScreenGui"
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
 
 local main = Instance.new("Frame")
 main.Name = "Main"
