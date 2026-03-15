@@ -388,34 +388,50 @@ spyBtn.FontFace = Font.new(
 )
 spyBtn.TextSize = 14
 spyBtn.Size = UDim2.new(0, 200, 0, 50)
+spyBtn.Parent = output
 
 local uICorneruiorent = Instance.new("UICorner")
+uICorneruiorent.CornerRadius = UDim.new(0, 8)
 uICorneruiorent = spyBtn
 
 local uICorner = Instance.new("UICorner")
 uICorner.Name = "UICorner"
 uICorner.Parent = clearlog
 
-local camera = workspace.CurrentCamera
-local masterFrame = script.Parent
-local uiScale = Instance.new("UIScale", masterFrame)
+-- ==========================================
+-- SM AUTO-SCALE CORE (SM-SYSTEM)
+-- ==========================================
 
--- Độ phân giải màn hình của BẠN lúc thiết kế (ví dụ 1920x1080)
-local DESIGN_RES = Vector2.new(1920, 1080) 
+local ScaleContainer = Instance.new("Frame")
+ScaleContainer.Name = "SM_ScaleContainer"
+ScaleContainer.Size = UDim2.new(1, 0, 1, 0)
+ScaleContainer.BackgroundTransparency = 1
+ScaleContainer.Parent = screenGui
 
-local function resize()
-	local viewportSize = camera.ViewportSize
-	-- Tính tỷ lệ dựa trên chiều ngang màn hình hiện tại
-	local scaleFactor = viewportSize.X / DESIGN_RES.X
+local uiScale = Instance.new("UIScale")
+uiScale.Parent = ScaleContainer
 
-	-- Giới hạn scale (không để nó quá nhỏ trên điện thoại)
-	uiScale.Scale = math.clamp(scaleFactor, 0.4, 1.2) 
+-- Gán các bảng vào (Riêng lOGO_WHEN_ATTACHED để ngoài screenGui)
+main.Parent = ScaleContainer
+exec.Parent = ScaleContainer
+output.Parent = ScaleContainer
+
+local function handleScaling()
+    local currentRes = workspace.CurrentCamera.ViewportSize
+    if currentRes.X < 100 then return end -- Đợi màn hình load xong
+    
+    -- TỰ ĐỘNG: Giả định bạn thiết kế Main (857px) cho màn hình chuẩn 1920px
+    -- Tỉ lệ mong muốn: Main chiếm khoảng 45% chiều rộng màn hình
+    local targetWidth = 857 / 0.45 
+    
+    local finalScale = currentRes.X / targetWidth
+    
+    -- Giới hạn để không bị quá bé hoặc quá to
+    uiScale.Scale = math.clamp(finalScale, 0.5, 1.2)
 end
 
--- Cập nhật mỗi khi người chơi thay đổi kích thước màn hình
-camera:GetPropertyChangedSignal("ViewportSize"):Connect(resize)
-resize() -- Chạy ngay khi bắt đầu
-
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(handleScaling)
+handleScaling()
 -- ==========================================
 -- SM ENGINE CORE v3.5 - FULL OPTIMIZED
 -- ==========================================
@@ -423,21 +439,6 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
-
--- [ KHAI BÁO BIẾN UI ] - Đảm bảo bạn đã map đúng các biến này với GUI của bạn
--- local screenGui = script.Parent
--- local main, exec, output = screenGui.Main, screenGui.Exec, screenGui.Output
--- local output_2 = output.LogTextLabel -- Label chứa text log, nhớ bật RichText = true
--- local inputSctipt = exec.InputBox
--- local textButton = main.AttachButton
--- local eXECButton = exec.ExecuteButton
--- local textButton_2 = main.ScanButton
--- local closeButton = main.CloseButton
--- local minimizeButton = main.MinimizeButton
--- local lOGO_WHEN_ATTACHED, imageLabel_2 = main.Logo, main.Logo.OrbitIcon
--- local clearButton = output.ClearButton
--- local autoExecToggle = exec.AutoExecToggle
--- local execSSButton = exec.ExecSSButton
 
 -- ==========================================
 -- 1. CẤU HÌNH & TRẠNG THÁI HỆ THỐNG
@@ -511,103 +512,103 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
-	-- Xử lý tham số linh hoạt
-	if type(attachedObjects) == "number" then
-		lerpSpeed = attachedObjects
-		attachedObjects = {}
-	end
+    -- Kiểm tra nếu attachedObjects là số (lerpSpeed)
+    if type(attachedObjects) == "number" then
+        lerpSpeed = attachedObjects
+        attachedObjects = {}
+    end
 
-	attachedObjects = attachedObjects or {}
-	lerpSpeed = lerpSpeed or 0.15
+    attachedObjects = attachedObjects or {}
+    lerpSpeed = lerpSpeed or 0.15
 
-	local dragging = false
-	local dragInput
-	local dragStart
-	local startPositions = {}
-	local currentTargets = {} -- Lưu vị trí đích thực tế
+    local dragging = false
+    local dragInput, dragStart
+    local startPositions = {}
+    local currentTargets = {}
 
-	-- Khởi tạo vị trí đích ban đầu
-	currentTargets[mainFrame] = mainFrame.Position
-	for _, obj in ipairs(attachedObjects) do
-		currentTargets[obj] = obj.Position
-	end
+    -- Khởi tạo vị trí đích
+    currentTargets[mainFrame] = mainFrame.Position
+    for _, obj in ipairs(attachedObjects) do
+        currentTargets[obj] = obj.Position
+    end
 
-	local function update(input)
-		local delta = input.Position - dragStart
+    local function update(input)
+        -- LẤY SCALE TỰ ĐỘNG: Quan trọng để không bị đơ
+        local container = mainFrame.Parent
+        local uiScale = container and container:FindFirstChildOfClass("UIScale")
+        local s = uiScale and uiScale.Scale or 1
+        
+        local delta = (input.Position - dragStart) / s
 
-		-- Tính toán vị trí đích cho Frame chính
-		local sPosMain = startPositions[mainFrame]
-		if sPosMain then
-			currentTargets[mainFrame] = UDim2.new(
-				sPosMain.X.Scale, sPosMain.X.Offset + delta.X, 
-				sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y
-			)
-		end
+        local sPosMain = startPositions[mainFrame]
+        if sPosMain then
+            currentTargets[mainFrame] = UDim2.new(
+                sPosMain.X.Scale, sPosMain.X.Offset + delta.X, 
+                sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y
+            )
+        end
 
-		-- Tính toán cho các object đi kèm
-		for _, obj in ipairs(attachedObjects) do
-			local sPos = startPositions[obj]
-			if sPos then
-				currentTargets[obj] = UDim2.new(
-					sPos.X.Scale, sPos.X.Offset + delta.X, 
-					sPos.Y.Scale, sPos.Y.Offset + delta.Y
-				)
-			end
-		end
-	end
+        for _, obj in ipairs(attachedObjects) do
+            local sPos = startPositions[obj]
+            if sPos then
+                currentTargets[obj] = UDim2.new(
+                    sPos.X.Scale, sPos.X.Offset + delta.X, 
+                    sPos.Y.Scale, sPos.Y.Offset + delta.Y
+                )
+            end
+        end
+    end
 
-	mainFrame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            
+            startPositions[mainFrame] = mainFrame.Position
+            for _, obj in ipairs(attachedObjects) do
+                startPositions[obj] = obj.Position
+            end
 
-			-- Ghi lại vị trí bắt đầu của mọi thứ
-			startPositions[mainFrame] = mainFrame.Position
-			for _, obj in ipairs(attachedObjects) do
-				startPositions[obj] = obj.Position
-			end
+            local connection
+            connection = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    connection:Disconnect()
+                end
+            end)
+        end
+    end)
 
-			local connection
-			connection = input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-					connection:Disconnect()
-				end
-			end)
-		end
-	end)
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
 
-	mainFrame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
-	end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            update(input)
+        end
+    end)
 
-	UserInputService.InputChanged:Connect(function(input)
-		if dragging and input == dragInput then
-			update(input)
-		end
-	end)
-
-	-- Vòng lặp Lerp mượt mà
-	RunService.RenderStepped:Connect(function()
-		-- Luôn Lerp về vị trí đích (giúp hiệu ứng mượt hơn kể cả khi vừa thả tay)
-		mainFrame.Position = mainFrame.Position:Lerp(currentTargets[mainFrame], lerpSpeed)
-
-		for _, obj in ipairs(attachedObjects) do
-			if currentTargets[obj] then
-				obj.Position = obj.Position:Lerp(currentTargets[obj], lerpSpeed)
-			end
-		end
-	end)
+    RunService.RenderStepped:Connect(function()
+        if currentTargets[mainFrame] then
+            mainFrame.Position = mainFrame.Position:Lerp(currentTargets[mainFrame], lerpSpeed)
+        end
+        for _, obj in ipairs(attachedObjects) do
+            if currentTargets[obj] then
+                obj.Position = obj.Position:Lerp(currentTargets[obj], lerpSpeed)
+            end
+        end
+    end)
 end
 
 -- ==========================================
--- CÁCH DÙNG (CHỈ GỌI 1 LẦN CHO NHÓM)
+-- GỌI HÀM ĐỂ KÉO RIÊNG TỪNG CÁI
 -- ==========================================
--- Giả sử 'main' là bảng điều khiển, 'exec' và 'output' đi theo nó:
--- Bỏ các dòng cũ đi, chỉ dùng 1 dòng này:
-makeDraggableSmooth(main, {exec, output}, 0.2)
+makeDraggableSmooth(main, 0.2)   -- Kéo main chỉ đi mình main
+makeDraggableSmooth(exec, 0.2)   -- Kéo exec chỉ đi mình exec
+makeDraggableSmooth(output, 0.2) -- Kéo output chỉ đi mình output
 
 -- ==========================================
 -- 4. QUẢN LÝ CỬA SỔ & HOẠT ẢNH
@@ -963,13 +964,80 @@ if clearlog then
 end
 
 -- ==========================================
--- TỐI ƯU HÓA TỰ ĐỘNG CUỘN (TÍCH HỢP)
+-- LOGIC CỐT LÕI: REMOTE SPY
 -- ==========================================
--- Đảm bảo mỗi khi có log mới, thanh cuộn tự động nhảy xuống cuối
-output_2:GetPropertyChangedSignal("Text"):Connect(function()
-	if backout_2 then
-		-- Đợi 1 frame để Roblox tính toán lại TextBounds
-		RunService.Heartbeat:Wait() 
-		backout_2.CanvasPosition = Vector2.new(0, math.max(0, backout_2.AbsoluteCanvasSize.Y - backout_2.AbsoluteWindowSize.Y))
-	end
-end)
+
+-- Thêm trạng thái Spy vào EngineState nếu chưa có
+if not EngineState then EngineState = {} end
+EngineState.SpyEnabled = false
+EngineState.SpyHooked = false
+
+-- ==========================================
+-- REMOTE SPY HYBRID (SUPPORT ALL EXECUTORS)
+-- ==========================================
+
+if spyBtn then
+    spyBtn.MouseButton1Click:Connect(function()
+        EngineState.SpyEnabled = not EngineState.SpyEnabled
+        
+        if EngineState.SpyEnabled then
+            spyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+            spyBtn.Text = "Spying: ON"
+            logMessage("Attempting to hook remotes...", Colors.Warning)
+
+            if EngineState.SpyHooked then return end -- Đã hook rồi thì không làm lại
+
+            -- KIỂM TRA KHẢ NĂNG CỦA EXECUTOR
+            local hasMetamethod = (hookmetamethod ~= nil)
+            local hasHookFunction = (hookfunction ~= nil)
+
+            if hasMetamethod then
+                -- CÁCH 1: XỊN NHẤT (Sử dụng __namecall)
+                logMessage("Using High-Level Hook (Namecall)...", Colors.Success)
+                local oldNamecall
+                oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+                    local method = getnamecallmethod()
+                    if EngineState.SpyEnabled and not checkcaller() then
+                        if method == "FireServer" or method == "InvokeServer" then
+                            task.spawn(function() logMessage("[Spy] " .. self.Name .. " (" .. method .. ")", Colors.Warning) end)
+                        end
+                    end
+                    return oldNamecall(self, ...)
+                end)
+                EngineState.SpyHooked = true
+
+            elseif hasHookFunction then
+                -- CÁCH 2: CỔ ĐIỂN (Hook trực tiếp vào hàm FireServer/InvokeServer)
+                logMessage("Fallback: Using Direct Function Hook...", Colors.Info)
+                
+                local oldFireServer
+                oldFireServer = hookfunction(Instance.new("RemoteEvent").FireServer, function(self, ...)
+                    if EngineState.SpyEnabled and not checkcaller() then
+                        task.spawn(function() logMessage("[Spy] " .. self.Name .. " (FireServer)", Colors.Warning) end)
+                    end
+                    return oldFireServer(self, ...)
+                end)
+
+                local oldInvokeServer
+                oldInvokeServer = hookfunction(Instance.new("RemoteFunction").InvokeServer, function(self, ...)
+                    if EngineState.SpyEnabled and not checkcaller() then
+                        task.spawn(function() logMessage("[Spy] " .. self.Name .. " (InvokeServer)", Colors.Warning) end)
+                    end
+                    return oldInvokeServer(self, ...)
+                end)
+                EngineState.SpyHooked = true
+            else
+                -- CÁCH 3: TRƯỜNG HỢP EXECUTOR QUÁ YẾU
+                logMessage("CRITICAL: Your executor does not support any Hooking API.", Colors.Error)
+                EngineState.SpyEnabled = false
+                spyBtn.BackgroundColor3 = Color3.new(0.82, 0, 0)
+                spyBtn.Text = "Not Supported"
+            end
+        else
+            spyBtn.BackgroundColor3 = Color3.new(0.82, 0, 0)
+            spyBtn.Text = "Remote Spy"
+            logMessage("Remote Spy Paused.", Colors.Info)
+        end
+    end)
+end
+
