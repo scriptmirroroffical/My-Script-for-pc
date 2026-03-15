@@ -175,21 +175,73 @@ local uICorner_9 = Instance.new("UICorner")
 uICorner_9.Name = "UICorner"
 uICorner_9.Parent = mainExec
 
+-- 1. Khung chứa chính (Cố định kích thước)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 805, 0, 415)
+mainFrame.Position = UDim2.new(0.0215, 0, 0.026, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(143, 143, 143)
+mainFrame.Parent = mainExec
+
+-- 1. Khung cuộn chính (Chứa cả số dòng và TextBox)
+local scroll = Instance.new("ScrollingFrame")
+scroll.Name = "CodeEditor"
+scroll.Size = UDim2.new(0, 805, 0, 415)
+scroll.Position = UDim2.new(0.0215, 0, 0.026, 0)
+scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+scroll.BorderSizePixel = 0
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.ScrollBarThickness = 8
+scroll.Parent = mainExec
+
+-- 2. Cột chứa số dòng (Line Numbers)
+local lineCounter = Instance.new("TextLabel")
+lineCounter.Name = "LineCounter"
+lineCounter.Size = UDim2.new(0, 40, 1, 0) -- Độ rộng cột số dòng là 40
+lineCounter.AutomaticSize = Enum.AutomaticSize.Y
+lineCounter.BackgroundTransparency = 1
+lineCounter.Text = "1"
+lineCounter.TextColor3 = Color3.fromRGB(150, 150, 150)
+lineCounter.TextSize = 14 -- Số dòng nhỏ xinh
+lineCounter.Font = Enum.Font.Code
+lineCounter.TextYAlignment = Enum.TextYAlignment.Top
+lineCounter.TextXAlignment = Enum.TextXAlignment.Center
+lineCounter.Parent = scroll
+
+-- 3. TextBox để nhập Script
 local inputSctipt = Instance.new("TextBox")
 inputSctipt.Name = "InputSctipt"
-inputSctipt.CursorPosition = -1
-inputSctipt.TextColor3 = Color3.new()
-inputSctipt.Text = ""
-inputSctipt.BackgroundColor3 = Color3.new(0.561, 0.561, 0.561)
-inputSctipt.BorderSizePixel = 0
-inputSctipt.BorderColor3 = Color3.new()
-inputSctipt.FontFace = Font.new("rbxasset://fonts/families/ComicNeueAngular.json")
+inputSctipt.Size = UDim2.new(1, -45, 0, 0) -- Trừ ra khoảng trống cho cột số dòng
+inputSctipt.Position = UDim2.new(0, 45, 0, 0)
+inputSctipt.AutomaticSize = Enum.AutomaticSize.Y
+inputSctipt.BackgroundTransparency = 1
+inputSctipt.MultiLine = true
+inputSctipt.ClearTextOnFocus = false
+inputSctipt.TextWrapped = false -- Tắt cái này để code không bị xuống dòng linh tinh
+inputSctipt.TextSize = 16 -- Kích thước vừa đủ đọc
+inputSctipt.TextColor3 = Color3.new(1, 1, 1)
+inputSctipt.Font = Enum.Font.Code
 inputSctipt.TextXAlignment = Enum.TextXAlignment.Left
-inputSctipt.Position = UDim2.new(0.0215, 0, 0.026, 0)
 inputSctipt.TextYAlignment = Enum.TextYAlignment.Top
-inputSctipt.TextSize = 14
-inputSctipt.Size = UDim2.new(0, 805, 0, 415)
-inputSctipt.Parent = mainExec
+inputSctipt.Text = ""
+inputSctipt.Parent = scroll
+
+-- 4. Logic tự động cập nhật số dòng
+local function updateLineNumbers()
+	local _, lines = inputSctipt.Text:gsub("\n", "\n")
+	local lineText = ""
+	for i = 1, lines + 1 do
+		lineText = lineText .. i .. "\n"
+	end
+	lineCounter.Text = lineText
+end
+
+-- Cập nhật mỗi khi gõ chữ
+inputSctipt:GetPropertyChangedSignal("Text"):Connect(updateLineNumbers)
+
+-- FIX LỖI NHẬP LIỆU: Đảm bảo TextBox luôn có thể nhấn vào
+inputSctipt.Active = true 
+inputSctipt.Selectable = true
 
 local uICorner_10 = Instance.new("UICorner")
 uICorner_10.Name = "UICorner"
@@ -1040,4 +1092,3 @@ if spyBtn then
         end
     end)
 end
-
