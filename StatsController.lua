@@ -1,973 +1,324 @@
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ScreenGui"
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = game.CoreGui
+-- Modern Loading UI với TweenService + Gradient
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "LoadingUI"
+
+-- Background mờ
+local bg = Instance.new("Frame", screenGui)
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+bg.BackgroundTransparency = 1 -- bắt đầu ẩn
+
+-- Container chính
+local container = Instance.new("Frame", screenGui)
+container.Size = UDim2.new(0.4, 0, 0.15, 0)
+container.Position = UDim2.new(0.3, 0, 0.5, -60)
+container.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+container.BackgroundTransparency = 1 -- fade-in
+Instance.new("UICorner", container).CornerRadius = UDim.new(0, 12)
+
+-- Shadow nhẹ
+local stroke = Instance.new("UIStroke", container)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(60,60,60)
+
+-- Title
+local title = Instance.new("TextLabel", container)
+title.Size = UDim2.new(1,0,0.4,0)
+title.Text = "⚡ Loading Stats Controller..."
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.BackgroundTransparency = 1
+
+-- Progress bar background
+local barBg = Instance.new("Frame", container)
+barBg.Size = UDim2.new(0.9,0,0.25,0)
+barBg.Position = UDim2.new(0.05,0,0.6,0)
+barBg.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Instance.new("UICorner", barBg).CornerRadius = UDim.new(0,8)
+
+-- Progress bar fill
+local barFill = Instance.new("Frame", barBg)
+barFill.Size = UDim2.new(0,0,1,0)
+barFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0,8)
+
+-- Gradient cho bar
+local gradient = Instance.new("UIGradient", barFill)
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,200,255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(0,120,255))
+}
+gradient.Rotation = 0
+
+-- Percentage label
+local percentLabel = Instance.new("TextLabel", container)
+percentLabel.Size = UDim2.new(1,0,0.2,0)
+percentLabel.Position = UDim2.new(0,0,0.85,0)
+percentLabel.Text = "0%"
+percentLabel.TextScaled = true
+percentLabel.Font = Enum.Font.GothamSemibold
+percentLabel.TextColor3 = Color3.fromRGB(200,200,200)
+percentLabel.BackgroundTransparency = 1
+
+-- Fade-in UI
+TweenService:Create(bg, TweenInfo.new(0.5), {BackgroundTransparency = 0.4}):Play()
+TweenService:Create(container, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+
+-- Giả lập loading
+for i = 1, 100 do
+	local goal = {Size = UDim2.new(i/100,0,1,0)}
+	local tween = TweenService:Create(barFill, TweenInfo.new(0.02, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
+	tween:Play()
+	percentLabel.Text = i.."%"
+	wait(0.02)
+end
+
+-- Fade out UI khi xong
+TweenService:Create(container, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+TweenService:Create(bg, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+wait(0.6)
+screenGui:Destroy()
+
+--[[ 
+    STATS CONTROLLER: ULTIMATE FULL EDITION V7.1 (FIXED NOCLIP)
+    Features: Independent Fly Speed, Health Bypass, JumpPower, NoClip (X), UI Controls
+]]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+-- CẤU HÌNH MẶC ĐỊNH
+local stats = {
+	speed = 16,
+	jump = 50,
+	health = 100,
+	flySpeed = 50,
+	autoMaintain = true,
+	flying = false,
+	noClip = false
+}
+
+local flyForce, flyGyro
+
+-- CẬP NHẬT NHÂN VẬT KHI HỒI SINH
+player.CharacterAdded:Connect(function(newChar)
+	character = newChar
+	hrp = newChar:WaitForChild("HumanoidRootPart")
+	humanoid = newChar:WaitForChild("Humanoid")
+	stats.flying = false
+	stats.noClip = false -- Reset trạng thái NoClip khi chết để tránh lỗi vật lý
+end)
+
+-- KHỞI TẠO GUI
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "StatsController_V7_Fixed"
 screenGui.ResetOnSpawn = false
 
-local main = Instance.new("Frame")
-main.Name = "Main"
-main.BackgroundColor3 = Color3.new(1, 0.667, 0)
-main.Position = UDim2.new(0.266, 0, 0.0599, 0)
-main.BorderColor3 = Color3.new()
-main.BorderSizePixel = 0
-main.Size = UDim2.new(0, 857, 0, 46)
-main.Parent = screenGui
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 320, 0, 460)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -230)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.ClipsDescendants = true
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Name = "MinimizeButton"
-minimizeButton.TextWrapped = true
-minimizeButton.TextColor3 = Color3.new()
-minimizeButton.Text = "_"
-minimizeButton.BackgroundColor3 = Color3.new(0.561, 0.561, 0.561)
-minimizeButton.BorderSizePixel = 0
-minimizeButton.TextScaled = true
-minimizeButton.Position = UDim2.new(0.862, 0, -0.0217, 0)
-minimizeButton.FontFace = Font.new("rbxasset://fonts/families/ComicNeueAngular.json")
-minimizeButton.BorderColor3 = Color3.new()
-minimizeButton.TextSize = 14
-minimizeButton.Size = UDim2.new(0, 59, 0, 46)
-minimizeButton.Parent = main
+-- Title
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "⚡ STATS CONTROLLER V7.1"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
 
-local uICorner = Instance.new("UICorner")
-uICorner.Name = "UICorner"
-uICorner.CornerRadius = UDim.new(1, 0)
-uICorner.Parent = minimizeButton
+-- NÚT THU NHỎ
+local miniBtn = Instance.new("TextButton", mainFrame)
+miniBtn.Size = UDim2.new(0, 30, 0, 30)
+miniBtn.Position = UDim2.new(1, -35, 0, 5)
+miniBtn.Text = "-"
+miniBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+miniBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", miniBtn).CornerRadius = UDim.new(0, 8)
 
-local name_exec = Instance.new("TextLabel")
-name_exec.Name = "Name.exec"
-name_exec.FontFace = Font.new(
-	"rbxasset://fonts/families/JosefinSans.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Italic
-)
-name_exec.TextColor3 = Color3.new()
-name_exec.Text = "SM Executor"
-name_exec.BackgroundColor3 = Color3.new(1, 0.667, 0)
-name_exec.BorderSizePixel = 0
-name_exec.TextScaled = true
-name_exec.Position = UDim2.new(0.0595, 0, 0.174, 0)
-name_exec.TextWrapped = true
-name_exec.BorderColor3 = Color3.new()
-name_exec.TextSize = 14
-name_exec.Size = UDim2.new(0, 251, 0, 37)
-name_exec.Parent = main
-
-local uICorner_2 = Instance.new("UICorner")
-uICorner_2.Name = "UICorner"
-uICorner_2.CornerRadius = UDim.new(1, 0)
-uICorner_2.Parent = name_exec
-
-local closeButton = Instance.new("TextButton")
-closeButton.Name = "CloseButton"
-closeButton.TextWrapped = true
-closeButton.TextColor3 = Color3.new()
-closeButton.Text = "X"
-closeButton.BackgroundColor3 = Color3.new(1, 0, 0)
-closeButton.BorderSizePixel = 0
-closeButton.TextScaled = true
-closeButton.Position = UDim2.new(0.931, 0, 0, 0)
-closeButton.FontFace = Font.new("rbxasset://fonts/families/ComicNeueAngular.json")
-closeButton.BorderColor3 = Color3.new()
-closeButton.TextSize = 14
-closeButton.Size = UDim2.new(0, 59, 0, 47)
-closeButton.Parent = main
-
-local uICorner_3 = Instance.new("UICorner")
-uICorner_3.Name = "UICorner"
-uICorner_3.CornerRadius = UDim.new(1, 0)
-uICorner_3.Parent = closeButton
-
-local uICorner_4 = Instance.new("UICorner")
-uICorner_4.Name = "UICorner"
-uICorner_4.CornerRadius = UDim.new(1, 0)
-uICorner_4.Parent = main
-
-local logo = Instance.new("ImageLabel")
-logo.Name = "Logo"
-logo.Image = "rbxassetid://88774721887954"
-logo.BackgroundColor3 = Color3.new(1, 1, 1)
-logo.BorderColor3 = Color3.new()
-logo.BorderSizePixel = 0
-logo.Size = UDim2.new(0, 51, 0, 45)
-logo.Parent = main
-
-local uICorner_5 = Instance.new("UICorner")
-uICorner_5.Name = "UICorner"
-uICorner_5.CornerRadius = UDim.new(1, 0)
-uICorner_5.Parent = logo
-
-local output = Instance.new("Frame")
-output.Name = "Output"
-output.BackgroundColor3 = Color3.new()
-output.Position = UDim2.new(0.523, 0, 0.101, 0)
-output.BorderColor3 = Color3.new()
-output.BorderSizePixel = 0
-output.Size = UDim2.new(0, 507, 0, 580)
-output.Parent = screenGui
-
-local uICorner_6 = Instance.new("UICorner")
-uICorner_6.Name = "UICorner"
-uICorner_6.Parent = output
-
--- Tạo ScrollingFrame thay cho TextLabel
-local backout_2 = Instance.new("ScrollingFrame")
-backout_2.Name = "Output"
-backout_2.BackgroundColor3 = Color3.new(0.498, 0.498, 0.498)
-backout_2.BorderSizePixel = 0
-backout_2.BorderColor3 = Color3.new()
-backout_2.Position = UDim2.new(0.00986, 0, 0.0155, 0)
-backout_2.Size = UDim2.new(0, 496, 0, 500)
-backout_2.CanvasSize = UDim2.new(0, 0, 0, 0) -- sẽ tự chỉnh theo nội dung
-backout_2.ScrollBarThickness = 8
-backout_2.Parent = output
-
--- Tạo TextLabel bên trong ScrollingFrame để hiển thị chữ
-local output_2 = Instance.new("TextLabel")
-output_2.Name = "TextInside"
-output_2.FontFace = Font.new("rbxasset://fonts/families/JosefinSans.json")
-output_2.TextColor3 = Color3.new()
-output_2.Text = "Welcome to SM Executor"
-output_2.RichText = true 
-output_2.BackgroundTransparency = 1
-output_2.BorderSizePixel = 0
-output_2.TextWrapped = true
-output_2.TextXAlignment = Enum.TextXAlignment.Left
-output_2.TextYAlignment = Enum.TextYAlignment.Top
-output_2.TextSize = 18
-output_2.Size = UDim2.new(1, -10, 0, 500) -- rộng bằng ScrollingFrame, trừ đi chút cho scrollbar
-output_2.Position = UDim2.new(0, 5, 0, 0)
-output_2.Parent = backout_2
-
--- Cập nhật CanvasSize theo nội dung
-output_2:GetPropertyChangedSignal("TextBounds"):Connect(function()
-	backout_2.CanvasSize = UDim2.new(0, 0, 0, output_2.TextBounds.Y + 20)
+local minimized = false
+miniBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	mainFrame:TweenSize(minimized and UDim2.new(0, 320, 0, 40) or UDim2.new(0, 320, 0, 460), "Out", "Quad", 0.3, true)
+	miniBtn.Text = minimized and "+" or "-"
 end)
 
--- Gọi lần đầu
-backout_2.CanvasSize = UDim2.new(0, 0, 0, output_2.TextBounds.Y + 20)
+-- Hàm tạo Input
+local function createInput(name, default, posY)
+	local frame = Instance.new("Frame", mainFrame)
+	frame.Size = UDim2.new(1, -20, 0, 45)
+	frame.Position = UDim2.new(0, 10, 0, posY)
+	frame.BackgroundTransparency = 1
 
-local uICorner_7 = Instance.new("UICorner")
-uICorner_7.Name = "UICorner"
-uICorner_7.Parent = output_2
+	local label = Instance.new("TextLabel", frame)
+	label.Size = UDim2.new(0.5, 0, 1, 0)
+	label.Text = name .. ":"
+	label.TextColor3 = Color3.fromRGB(200, 200, 200)
+	label.BackgroundTransparency = 1
+	label.Font = Enum.Font.GothamSemibold
+	label.TextSize = 13
+	label.TextXAlignment = Enum.TextXAlignment.Left
 
-local exec = Instance.new("Frame")
-exec.Name = "Exec"
-exec.BackgroundColor3 = Color3.new()
-exec.Position = UDim2.new(0.146, 0, 0.0998, 0)
-exec.BorderColor3 = Color3.new()
-exec.BorderSizePixel = 0
-exec.Size = UDim2.new(0, 857, 0, 518)
-exec.Parent = screenGui
+	local box = Instance.new("TextBox", frame)
+	box.Size = UDim2.new(0.45, 0, 0.7, 0)
+	box.Position = UDim2.new(0.55, 0, 0.15, 0)
+	box.Text = tostring(default)
+	box.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+	box.TextColor3 = Color3.new(1, 1, 1)
+	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
-local uICorner_8 = Instance.new("UICorner")
-uICorner_8.Name = "UICorner"
-uICorner_8.Parent = exec
-
-local mainExec = Instance.new("Frame")
-mainExec.Name = "MainExec"
-mainExec.BackgroundColor3 = Color3.new(1, 0.667, 0)
-mainExec.Position = UDim2.new(0.0105, 0, 0.0174, 0)
-mainExec.BorderColor3 = Color3.new()
-mainExec.BorderSizePixel = 0
-mainExec.Size = UDim2.new(0, 839, 0, 500)
-mainExec.Parent = exec
-
-local uICorner_9 = Instance.new("UICorner")
-uICorner_9.Name = "UICorner"
-uICorner_9.Parent = mainExec
-
--- 1. Khung chứa chính (Cố định kích thước)
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 805, 0, 415)
-mainFrame.Position = UDim2.new(0.0215, 0, 0.026, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(143, 143, 143)
-mainFrame.Parent = mainExec
-
--- 1. Khung cuộn chính (Chứa cả số dòng và TextBox)
-local scroll = Instance.new("ScrollingFrame")
-scroll.Name = "CodeEditor"
-scroll.Size = UDim2.new(0, 805, 0, 415)
-scroll.Position = UDim2.new(0.0215, 0, 0.026, 0)
-scroll.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-scroll.BorderSizePixel = 0
-scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-scroll.ScrollBarThickness = 8
-scroll.Parent = mainExec
-
--- 2. Cột chứa số dòng (Line Numbers)
-local lineCounter = Instance.new("TextLabel")
-lineCounter.Name = "LineCounter"
-lineCounter.Size = UDim2.new(0, 40, 1, 0) -- Độ rộng cột số dòng là 40
-lineCounter.AutomaticSize = Enum.AutomaticSize.Y
-lineCounter.BackgroundTransparency = 1
-lineCounter.Text = "1"
-lineCounter.TextColor3 = Color3.fromRGB(150, 150, 150)
-lineCounter.TextSize = 14 -- Số dòng nhỏ xinh
-lineCounter.Font = Enum.Font.Code
-lineCounter.TextYAlignment = Enum.TextYAlignment.Top
-lineCounter.TextXAlignment = Enum.TextXAlignment.Center
-lineCounter.Parent = scroll
-
--- 3. TextBox để nhập Script
-local inputSctipt = Instance.new("TextBox")
-inputSctipt.Name = "InputSctipt"
-inputSctipt.Size = UDim2.new(1, -45, 0, 0) -- Trừ ra khoảng trống cho cột số dòng
-inputSctipt.Position = UDim2.new(0, 45, 0, 0)
-inputSctipt.AutomaticSize = Enum.AutomaticSize.Y
-inputSctipt.BackgroundTransparency = 1
-inputSctipt.MultiLine = true
-inputSctipt.ClearTextOnFocus = false
-inputSctipt.TextWrapped = false -- Tắt cái này để code không bị xuống dòng linh tinh
-inputSctipt.TextSize = 16 -- Kích thước vừa đủ đọc
-inputSctipt.TextColor3 = Color3.new(1, 1, 1)
-inputSctipt.Font = Enum.Font.Code
-inputSctipt.TextXAlignment = Enum.TextXAlignment.Left
-inputSctipt.TextYAlignment = Enum.TextYAlignment.Top
-inputSctipt.Text = ""
-inputSctipt.Parent = scroll
-
--- 4. Logic tự động cập nhật số dòng
-local function updateLineNumbers()
-	local _, lines = inputSctipt.Text:gsub("\n", "\n")
-	local lineText = ""
-	for i = 1, lines + 1 do
-		lineText = lineText .. i .. "\n"
-	end
-	lineCounter.Text = lineText
+	box.FocusLost:Connect(function()
+		local val = tonumber(box.Text)
+		local keyMap = {["Walk Speed"]="speed", ["Jump Power"]="jump", ["Health (Bypass BETA-v2)"]="health", ["Fly Speed"]="flySpeed"}
+		if val then stats[keyMap[name]] = val else box.Text = tostring(stats[keyMap[name]]) end
+	end)
 end
 
--- Cập nhật mỗi khi gõ chữ
-inputSctipt:GetPropertyChangedSignal("Text"):Connect(updateLineNumbers)
+createInput("Walk Speed", stats.speed, 50)
+createInput("Jump Power", stats.jump, 100)
+createInput("Health (Bypass BETA-v2)", stats.health, 150)
+createInput("Fly Speed", stats.flySpeed, 200)
 
--- FIX LỖI NHẬP LIỆU: Đảm bảo TextBox luôn có thể nhấn vào
-inputSctipt.Active = true 
-inputSctipt.Selectable = true
+-- NÚT NOCLIP (ĐÃ FIX)
+local noclipBtn = Instance.new("TextButton", mainFrame)
+noclipBtn.Size = UDim2.new(1, -20, 0, 40)
+noclipBtn.Position = UDim2.new(0, 10, 0, 260)
+noclipBtn.Text = "NOCLIP: OFF"
+noclipBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+noclipBtn.TextColor3 = Color3.new(1, 1, 1)
+noclipBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", noclipBtn).CornerRadius = UDim.new(0, 8)
 
-local uICorner_10 = Instance.new("UICorner")
-uICorner_10.Name = "UICorner"
-uICorner_10.Parent = inputSctipt
+local function toggleNoClip()
+	stats.noClip = not stats.noClip
+	noclipBtn.Text = "NOCLIP: " .. (stats.noClip and "ON" or "OFF")
+	noclipBtn.BackgroundColor3 = stats.noClip and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(40, 40, 40)
 
-local textButton = Instance.new("TextButton")
-textButton.Name = "TextButton"
-textButton.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Italic
-)
-textButton.TextColor3 = Color3.new()
-textButton.Text = "ATTACH"
-textButton.BackgroundColor3 = Color3.new(0.333, 1, 1)
-textButton.TextScaled = true
-textButton.BorderSizePixel = 0
-textButton.Position = UDim2.new(0.722, 0, 0.881, 0)
-textButton.TextWrapped = true
-textButton.BorderColor3 = Color3.new()
-textButton.TextSize = 14
-textButton.Size = UDim2.new(0, 200, 0, 50)
-textButton.Parent = mainExec
-
-local uICorner_11 = Instance.new("UICorner")
-uICorner_11.Name = "UICorner"
-uICorner_11.CornerRadius = UDim.new(1, 0)
-uICorner_11.Parent = textButton
-
-local textButton_2 = Instance.new("TextButton")
-textButton_2.Name = "TextButton_2"
-textButton_2.TextWrapped = true
-textButton_2.TextColor3 = Color3.new()
-textButton_2.BorderColor3 = Color3.new()
-textButton_2.Text = "Scan SS"
-textButton_2.BackgroundColor3 = Color3.new(1, 0.333, 0)
-textButton_2.BorderSizePixel = 0
-textButton_2.Position = UDim2.new(0.209, 0, 0.881, 0)
-textButton_2.TextScaled = true
-textButton_2.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Italic
-)
-textButton_2.TextSize = 14
-textButton_2.Size = UDim2.new(0, 142, 0, 50)
-textButton_2.Parent = mainExec
-
-local uICorner_12 = Instance.new("UICorner")
-uICorner_12.Name = "UICorner"
-uICorner_12.CornerRadius = UDim.new(1, 0)
-uICorner_12.Parent = textButton_2
-
-local resetModeBtn = Instance.new("TextButton")
-resetModeBtn.Name = "resetModeBtn"
-resetModeBtn.TextWrapped = true
-resetModeBtn.TextColor3 = Color3.new()
-resetModeBtn.BorderColor3 = Color3.new()
-resetModeBtn.Text = "Return to cilent"
-resetModeBtn.BackgroundColor3 = Color3.new(0.667, 0.667, 1)
-resetModeBtn.BorderSizePixel = 0
-resetModeBtn.Position = UDim2.new(0.39, 0, 0.881, 0)
-resetModeBtn.TextScaled = true
-resetModeBtn.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Italic
-)
-resetModeBtn.TextSize = 14
-resetModeBtn.Size = UDim2.new(0, 133, 0, 50)
-resetModeBtn.Parent = mainExec
-
-local uICorner = Instance.new("UICorner")
-uICorner.Name = "UICorner"
-uICorner.CornerRadius = UDim.new(1, 0)
-uICorner.Parent = resetModeBtn
-
-local eXECButton = Instance.new("TextButton")
-eXECButton.Name = "EXECButton"
-eXECButton.TextWrapped = true
-eXECButton.TextColor3 = Color3.new()
-eXECButton.Parent = mainExec
-eXECButton.BorderColor3 = Color3.new()
-eXECButton.Text = "EXECUTE"
-eXECButton.BackgroundColor3 = Color3.new(0, 0.667, 1)
-eXECButton.BorderSizePixel = 0
-eXECButton.Position = UDim2.new(0.0327, 0, 0.881, 0)
-eXECButton.TextScaled = true
-eXECButton.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Normal
-)
-eXECButton.TextSize = 14
-eXECButton.Size = UDim2.new(0, 142, 0, 50)
-
-local uICorner = Instance.new("UICorner")
-uICorner.Name = "UICorner"
-uICorner.CornerRadius = UDim.new(1, 0)
-uICorner.Parent = eXECButton
-
-local uICorner_13 = Instance.new("UICorner")
-uICorner_13.Name = "UICorner"
-uICorner_13.CornerRadius = UDim.new(1, 0)
-uICorner_13.Parent = eXECButton
-
-local lOGO_WHEN_ATTACHED = Instance.new("Frame")
-lOGO_WHEN_ATTACHED.Name = "LOGO_WHEN_ATTACHED"
-lOGO_WHEN_ATTACHED.BackgroundColor3 = Color3.new(1, 1, 1)
-lOGO_WHEN_ATTACHED.BackgroundTransparency = 1
-lOGO_WHEN_ATTACHED.Position = UDim2.new(0.0247, 0, 0.826, 0)
-lOGO_WHEN_ATTACHED.BorderColor3 = Color3.new()
-lOGO_WHEN_ATTACHED.BorderSizePixel = 0
-lOGO_WHEN_ATTACHED.Size = UDim2.new(0, 162, 0, 162)
-lOGO_WHEN_ATTACHED.Parent = screenGui
-
-local imageLabel = Instance.new("ImageLabel")
-imageLabel.Name = "ImageLabel"
-imageLabel.BorderColor3 = Color3.new()
-imageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
-imageLabel.Image = "rbxassetid://124336823407341"
-imageLabel.BackgroundTransparency = 1
-imageLabel.Position = UDim2.new(-0.0163, 0, 0.0926, 0)
-imageLabel.BorderSizePixel = 0
-imageLabel.Size = UDim2.new(0, 162, 0, 131)
-imageLabel.Parent = lOGO_WHEN_ATTACHED
-
-local uICorner_14 = Instance.new("UICorner")
-uICorner_14.Name = "UICorner"
-uICorner_14.CornerRadius = UDim.new(1, 0)
-uICorner_14.Parent = imageLabel
-
-local imageLabel_2 = Instance.new("ImageLabel")
-imageLabel_2.Name = "ImageLabel"
-imageLabel_2.BackgroundColor3 = Color3.new(1, 1, 1)
-imageLabel_2.Image = "rbxassetid://88774721887954"
-imageLabel_2.Position = UDim2.new(0.426, 0, -0.0123, 0)
-imageLabel_2.BorderColor3 = Color3.new()
-imageLabel_2.BorderSizePixel = 0
-imageLabel_2.Size = UDim2.new(0, 45, 0, 42)
-imageLabel_2.Parent = lOGO_WHEN_ATTACHED
-
-local uICorner_15 = Instance.new("UICorner")
-uICorner_15.Name = "UICorner"
-uICorner_15.CornerRadius = UDim.new(1, 0)
-uICorner_15.Parent = imageLabel_2
-
-local uICorner_16 = Instance.new("UICorner")
-uICorner_16.Name = "UICorner"
-uICorner_16.Parent = lOGO_WHEN_ATTACHED
-
-local imageLabel_3 = Instance.new("ImageLabel")
-imageLabel_3.Name = "ImageLabel"
-imageLabel_3.BorderColor3 = Color3.new()
-imageLabel_3.BackgroundColor3 = Color3.new(1, 1, 1)
-imageLabel_3.Image = "rbxassetid://124001967339217"
-imageLabel_3.BackgroundTransparency = 1
-imageLabel_3.Position = UDim2.new(-0.124, 0, -0.0123, 0)
-imageLabel_3.BorderSizePixel = 0
-imageLabel_3.Size = UDim2.new(0, 196, 0, 165)
-imageLabel_3.Parent = lOGO_WHEN_ATTACHED
-
-local clearlog = Instance.new("TextButton")
-clearlog.Name = "Clearlog"
-clearlog.TextWrapped = true
-clearlog.TextColor3 = Color3.new()
-clearlog.BorderColor3 = Color3.new()
-clearlog.Text = "Clear Log"
-clearlog.BackgroundColor3 = Color3.new(0.455, 0.455, 0.455)
-clearlog.BorderSizePixel = 0
-clearlog.Position = UDim2.new(0.0217, 0, 0.901, 0)
-clearlog.TextScaled = true
-clearlog.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Normal
-)
-clearlog.TextSize = 14
-clearlog.Size = UDim2.new(0, 200, 0, 50)
-clearlog.Parent = output
-
-local spyBtn = Instance.new("TextButton")
-spyBtn.Name = "spyBtn"
-spyBtn.TextWrapped = true
-spyBtn.TextColor3 = Color3.new()
-spyBtn.BorderColor3 = Color3.new()
-spyBtn.Text = "Remote Spy"
-spyBtn.BackgroundColor3 = Color3.new(0.82, 0, 0)
-spyBtn.BorderSizePixel = 0
-spyBtn.Position = UDim2.new(0.582, 0, 0.901, 0)
-spyBtn.TextScaled = true
-spyBtn.FontFace = Font.new(
-	"rbxasset://fonts/families/PatrickHand.json",
-	Enum.FontWeight.Bold,
-	Enum.FontStyle.Normal
-)
-spyBtn.TextSize = 14
-spyBtn.Size = UDim2.new(0, 200, 0, 50)
-spyBtn.Parent = output
-
-local uICorneruiorent = Instance.new("UICorner")
-uICorneruiorent.CornerRadius = UDim.new(0, 8)
-uICorneruiorent = spyBtn
-
-local uICorner = Instance.new("UICorner")
-uICorner.Name = "UICorner"
-uICorner.Parent = clearlog
-
--- ==========================================
--- SM AUTO-SCALE CORE (SM-SYSTEM)
--- ==========================================
-
-local ScaleContainer = Instance.new("Frame")
-ScaleContainer.Name = "SM_ScaleContainer"
-ScaleContainer.Size = UDim2.new(1, 0, 1, 0)
-ScaleContainer.BackgroundTransparency = 1
-ScaleContainer.Parent = screenGui
-
-local uiScale = Instance.new("UIScale")
-uiScale.Parent = ScaleContainer
-
--- Gán các bảng vào (Riêng lOGO_WHEN_ATTACHED để ngoài screenGui)
-main.Parent = ScaleContainer
-exec.Parent = ScaleContainer
-output.Parent = ScaleContainer
-
-local function handleScaling()
-    local currentRes = workspace.CurrentCamera.ViewportSize
-    if currentRes.X < 100 then return end -- Đợi màn hình load xong
-    
-    -- TỰ ĐỘNG: Giả định bạn thiết kế Main (857px) cho màn hình chuẩn 1920px
-    -- Tỉ lệ mong muốn: Main chiếm khoảng 45% chiều rộng màn hình
-    local targetWidth = 857 / 0.45 
-    
-    local finalScale = currentRes.X / targetWidth
-    
-    -- Giới hạn để không bị quá bé hoặc quá to
-    uiScale.Scale = math.clamp(finalScale, 0.5, 1.2)
-end
-
-workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(handleScaling)
-handleScaling()
-
--- ==========================================
--- SM ENGINE CORE v4.0 (-Preview-) - FULL OPTIMIZED & SANDBOXED
--- ==========================================
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
-
--- ==========================================
--- 1. CẤU HÌNH & TRẠNG THÁI HỆ THỐNG
--- ==========================================
-local EngineState = {
-	IsAttached = false,
-	IsMinimized = false,
-	AutoExecEnabled = false,
-	SSMode = false,
-	SpyEnabled = false,
-	SpyHooked = false,
-	LogCount = 0,
-	MaxLogs = 100,
-	AutoExecFile = "SMEngine_AutoExec.txt"
-}
-
-local Colors = {
-	Info = Color3.fromRGB(0, 170, 255),
-	Success = Color3.fromRGB(0, 255, 100),
-	Warning = Color3.fromRGB(255, 170, 0),
-	Error = Color3.fromRGB(255, 50, 50),
-	Text = Color3.fromRGB(240, 240, 240),
-	System = Color3.fromRGB(170, 85, 255)
-}
-
-local TrapKeywords = {"ban", "kick", "detect", "anticheat", "security", "log"}
-local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-
--- ==========================================
--- 2. HỆ THỐNG FILE & LOGGER
--- ==========================================
-local function safeWriteFile(name, content)
-	if writefile then pcall(function() writefile(name, content) end) end
-end
-
-local function safeReadFile(name)
-	if readfile and isfile and isfile(name) then
-		local s, c = pcall(function() return readfile(name) end)
-		if s then return c end
-	end
-	return nil
-end
-
-local function logMessage(text, colorType)
-	local color = colorType or Colors.Text
-	local stamp = string.format("<font color=\"#888888\">[%s]</font>", os.date("%X"))
-	local hex = string.format("#%02X%02X%02X", color.R*255, color.G*255, color.B*255)
-
-	EngineState.LogCount = EngineState.LogCount + 1
-	if EngineState.LogCount > EngineState.MaxLogs and output_2 then
-		local currentText = output_2.Text
-		local firstLineBreak = currentText:find("\n")
-		if firstLineBreak then
-			output_2.Text = currentText:sub(firstLineBreak + 1)
-			EngineState.LogCount = EngineState.LogCount - 1
+	-- Fix: Bật lại va chạm ngay lập tức khi tắt
+	if not stats.noClip and character then
+		for _, part in ipairs(character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				-- Bật lại va chạm cho các bộ phận cơ bản để không bị xuyên đất
+				if part.Name == "HumanoidRootPart" or part.Name:find("Torso") or part.Name == "Head" then
+					part.CanCollide = true
+				end
+			end
 		end
 	end
+end
+noclipBtn.MouseButton1Click:Connect(toggleNoClip)
 
-	local msg = string.format("\n%s <font color=\"%s\">[>] %s</font>", stamp, hex, tostring(text))
-	if output_2 then
-		output_2.Text = output_2.Text .. msg
-		pcall(function()
-			local scroll = output_2.Parent
-			if scroll and scroll:IsA("ScrollingFrame") then
-				scroll.CanvasPosition = Vector2.new(0, scroll.AbsoluteWindowSize.Y + 9999)
-			end
-		end)
+-- NÚT FLY
+local flyBtn = Instance.new("TextButton", mainFrame)
+flyBtn.Size = UDim2.new(1, -20, 0, 40)
+flyBtn.Position = UDim2.new(0, 10, 0, 310)
+flyBtn.Text = "FLY: OFF"
+flyBtn.BackgroundColor3 = Color3.fromRGB(80, 20, 120)
+flyBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0, 8)
+
+flyBtn.MouseButton1Click:Connect(function()
+	stats.flying = not stats.flying
+	flyBtn.Text = "FLY: " .. (stats.flying and "ON" or "OFF")
+	flyBtn.BackgroundColor3 = stats.flying and Color3.fromRGB(130, 30, 200) or Color3.fromRGB(80, 20, 120)
+
+	if stats.flying then
+		flyForce = Instance.new("BodyPosition", hrp)
+		flyForce.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+		flyForce.Position = hrp.Position
+		flyGyro = Instance.new("BodyGyro", hrp)
+		flyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
 	else
-		print("[SM ENGINE] " .. tostring(text))
+		if flyForce then flyForce:Destroy() end
+		if flyGyro then flyGyro:Destroy() end
+		humanoid.PlatformStand = false
 	end
-end
-
--- ==========================================
--- 3. HỆ THỐNG SANDBOX (KHẮC PHỤC LỖI HUB/UI)
--- ==========================================
-local FakeGenv = {}
-local MockAPI = {
-    ["getgenv"] = function() return FakeGenv end,
-    ["getrenv"] = function() return getfenv(0) end,
-    ["identifyexecutor"] = function() return "SMEngine", "3.5" end,
-    ["setclipboard"] = function(t) logMessage("Clipboard: " .. tostring(t), Colors.Info) end,
-    ["isfile"] = function() return false end,
-    ["writefile"] = function(n, c) logMessage("Saved: " .. n, Colors.System) end,
-    ["readfile"] = function() return "" end,
-    ["delfile"] = function() return true end,
-    ["isfolder"] = function() return false end,
-    ["makefolder"] = function() return true end,
-    ["getcustomasset"] = function() return "rbxassetid://0" end,
-    ["gethui"] = function() 
-        local pg = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
-        return pg or game:GetService("CoreGui") 
-    end,
-}
-
-local function ExecuteWithSandbox(code)
-    local executorLoadstring = loadstring or (getgenv and getgenv().loadstring)
-    if not executorLoadstring then
-        return false, "Executor của bạn không hỗ trợ loadstring."
-    end
-
-    local func, compileError = executorLoadstring(code)
-    if not func then return false, "Syntax Error: " .. tostring(compileError) end
-
-    -- Thiết lập môi trường ảo
-    local env = getfenv(func)
-    local sandbox = setmetatable({}, {
-        __index = function(_, k)
-            if MockAPI[k] then return MockAPI[k] end
-            if k == "game" then
-                return setmetatable({}, {
-                    __index = function(_, gameKey)
-                        if gameKey == "GetService" then
-                            return function(self, sName)
-                                if sName == "CoreGui" then
-                                    local pg = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
-                                    return pg or game:GetService("CoreGui")
-                                end
-                                return game:GetService(sName)
-                            end
-                        end
-                        local s, r = pcall(function() return game[gameKey] end)
-                        return s and r or nil
-                    end
-                })
-            end
-            return env[k]
-        end,
-        __newindex = function(_, k, v) FakeGenv[k] = v end
-    })
-
-    setfenv(func, sandbox)
-    return pcall(func)
-end
-
--- ==========================================
--- 4. HỆ THỐNG KÉO THẢ TỐI ƯU
--- ==========================================
-local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
-    if type(attachedObjects) == "number" then
-        lerpSpeed = attachedObjects
-        attachedObjects = {}
-    end
-    attachedObjects = attachedObjects or {}
-    lerpSpeed = lerpSpeed or 0.15
-
-    local dragging, dragInput, dragStart = false, nil, nil
-    local startPositions, currentTargets = {}, {}
-
-    if not mainFrame then return end
-
-    currentTargets[mainFrame] = mainFrame.Position
-    for _, obj in ipairs(attachedObjects) do if obj then currentTargets[obj] = obj.Position end end
-
-    local function update(input)
-        local container = mainFrame.Parent
-        local uiScale = container and container:FindFirstChildOfClass("UIScale")
-        local s = uiScale and uiScale.Scale or 1
-        local delta = (input.Position - dragStart) / s
-
-        local sPosMain = startPositions[mainFrame]
-        if sPosMain then
-            currentTargets[mainFrame] = UDim2.new(sPosMain.X.Scale, sPosMain.X.Offset + delta.X, sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y)
-        end
-        for _, obj in ipairs(attachedObjects) do
-            local sPos = startPositions[obj]
-            if sPos then
-                currentTargets[obj] = UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y)
-            end
-        end
-    end
-
-    mainFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPositions[mainFrame] = mainFrame.Position
-            for _, obj in ipairs(attachedObjects) do startPositions[obj] = obj.Position end
-
-            local connection
-            connection = input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                    connection:Disconnect()
-                end
-            end)
-        end
-    end)
-
-    mainFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragInput then update(input) end
-    end)
-
-    RunService.RenderStepped:Connect(function()
-        if currentTargets[mainFrame] then mainFrame.Position = mainFrame.Position:Lerp(currentTargets[mainFrame], lerpSpeed) end
-        for _, obj in ipairs(attachedObjects) do
-            if currentTargets[obj] then obj.Position = obj.Position:Lerp(currentTargets[obj], lerpSpeed) end
-        end
-    end)
-end
-
--- Khởi tạo kéo thả (Cần đảm bảo các biến main, exec, output đã tồn tại)
-pcall(function()
-    makeDraggableSmooth(main, 0.2)
-    makeDraggableSmooth(exec, 0.2)
-    makeDraggableSmooth(output, 0.2)
 end)
 
--- ==========================================
--- 5. QUẢN LÝ CỬA SỔ & HOẠT ẢNH
--- ==========================================
-if closeButton then
-	closeButton.MouseButton1Click:Connect(function()
-		logMessage("Shutting down engine...", Colors.Warning)
-		if imageLabel_2 then imageLabel_2.Visible = false end
-		if main then TweenService:Create(main, tInfo, {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play() end
-		task.wait(0.5)
-		if screenGui then screenGui:Destroy() end
-	end)
-end
+-- NÚT AUTO-MAINTAIN
+local autoBtn = Instance.new("TextButton", mainFrame)
+autoBtn.Size = UDim2.new(1, -20, 0, 40)
+autoBtn.Position = UDim2.new(0, 10, 0, 360)
+autoBtn.Text = "Auto-Maintain: ON"
+autoBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+autoBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", autoBtn).CornerRadius = UDim.new(0, 8)
 
-if minimizeButton then
-	minimizeButton.MouseButton1Click:Connect(function()
-		EngineState.IsMinimized = not EngineState.IsMinimized
-		local targetAlpha = EngineState.IsMinimized and 1 or 0
-		local targetVis = not EngineState.IsMinimized
+autoBtn.MouseButton1Click:Connect(function()
+	stats.autoMaintain = not stats.autoMaintain
+	autoBtn.Text = "Auto-Maintain: " .. (stats.autoMaintain and "ON" or "OFF")
+	autoBtn.BackgroundColor3 = stats.autoMaintain and Color3.fromRGB(0, 120, 215) or Color3.fromRGB(100, 100, 100)
+end)
 
-		if exec then
-			TweenService:Create(exec, tInfo, {BackgroundTransparency = targetAlpha}):Play()
-			for _, v in pairs(exec:GetDescendants()) do if v:IsA("GuiObject") then v.Visible = targetVis end end
-		end
-		if output then
-			TweenService:Create(output, tInfo, {BackgroundTransparency = targetAlpha}):Play()
-			for _, v in pairs(output:GetDescendants()) do if v:IsA("GuiObject") then v.Visible = targetVis end end
-		end
-		logMessage(EngineState.IsMinimized and "Windows Minimized." or "Windows Restored.", Colors.Info)
-	end)
-end
+-- DRAG LOGIC
+local dragging, dragStart, startPos
+mainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true dragStart = input.Position startPos = mainFrame.Position
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
 
-if autoExecToggle then
-	autoExecToggle.MouseButton1Click:Connect(function()
-		EngineState.AutoExecEnabled = not EngineState.AutoExecEnabled
-		if EngineState.AutoExecEnabled then
-			if inputSctipt and inputSctipt.Text ~= "" then safeWriteFile(EngineState.AutoExecFile, inputSctipt.Text) end
-			logMessage("Auto-Execute ENABLED.", Colors.Success)
-			autoExecToggle.BackgroundColor3 = Colors.Success
-		else
-			logMessage("Auto-Execute DISABLED.", Colors.Warning)
-			autoExecToggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		end
-	end)
-end
-
-if clearlog then
-	clearlog.MouseButton1Click:Connect(function()
-		if output_2 then
-			local originalColor = clearlog.BackgroundColor3
-			clearlog.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-			output_2.Text = ""
-			EngineState.LogCount = 0
-			if backout_2 then
-				backout_2.CanvasPosition = Vector2.new(0, 0)
-				backout_2.CanvasSize = UDim2.new(0, 0, 0, 0)
+-- LOOP VẬT LÝ (NOCLIP)
+RunService.Stepped:Connect(function()
+	if stats.noClip and character then
+		for _, part in ipairs(character:GetDescendants()) do
+			if part:IsA("BasePart") and part.CanCollide then
+				part.CanCollide = false
 			end
-			logMessage("System Log Cleared.", Colors.System)
-			task.wait(0.1)
-			clearlog.BackgroundColor3 = originalColor
 		end
-	end)
-end
+	end
+end)
 
--- ==========================================
--- 6. LÕI THỰC THI (ATTACH, EXECUTE, SCAN, SPY)
--- ==========================================
+-- LOOP LOGIC
+RunService.Heartbeat:Connect(function()
+	if not character or not hrp or not humanoid then return end
 
--- Nút Attach
-if textButton then
-	textButton.MouseButton1Click:Connect(function()
-		if EngineState.IsAttached then logMessage("Already attached!", Colors.Warning) return end
+	if stats.flying then
+		local moveDir = Vector3.new()
+		local cam = workspace.CurrentCamera
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0,1,0) end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0,1,0) end
+		flyForce.Position = moveDir.Magnitude > 0 and hrp.Position + (moveDir.Unit * stats.flySpeed) or hrp.Position
+		flyGyro.CFrame = cam.CFrame
+		humanoid.PlatformStand = true
+	end
 
-		textButton.Text = "INJECTING..."
-		textButton.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
-		logMessage("Bypassing Environment...", Colors.Warning)
-
-		task.spawn(function()
-			task.wait(1.2)
-			EngineState.IsAttached = true
-			textButton.Text = "ATTACHED"
-			textButton.BackgroundColor3 = Colors.Success
-			logMessage("Attached Successfully! System Ready.", Colors.Success)
-
-			if EngineState.AutoExecEnabled then
-				local savedScript = safeReadFile(EngineState.AutoExecFile)
-				if savedScript and savedScript ~= "" then
-					logMessage("Running Auto-Exec payload...", Colors.System)
-					ExecuteWithSandbox(savedScript)
-				end
-			end
-		end)
-	end)
-end
-
--- Nút Scan SS (textButton_2)
-if textButton_2 then
-	textButton_2.MouseButton1Click:Connect(function()
-		logMessage("Deep Scan Initiated (Safety Mode: ON)...", Colors.Warning)
-		local foundCount = 0
-
-		task.spawn(function()
-			for _, item in pairs(game:GetDescendants()) do
-				if _ % 150 == 0 then RunService.Heartbeat:Wait() end 
-				if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
-					local name = item.Name:lower()
-					local isTrap = false
-					for _, word in ipairs(TrapKeywords) do
-						if name:find(word) then isTrap = true break end
-					end
-
-					if isTrap then
-						logMessage("⚠️ TRAP DETECTED: " .. item.Name, Colors.Error)
-					else
-						if name:find("run") or name:find("load") or name:find("exec") or #name > 30 then
-							logMessage("✅ Vulnerable Found: " .. item.Name, Colors.Success)
-							foundCount = foundCount + 1
-						end
-					end
-				end
-			end
-
-			if foundCount > 0 then
-				EngineState.SSMode = true
-				if eXECButton then
-					eXECButton.Text = "EXECUTE (SS)"
-					eXECButton.BackgroundColor3 = Colors.System
-				end
-				logMessage("Scan Complete: " .. foundCount .. " remotes verified safe.", Colors.Success)
-			else
-				logMessage("Scan Complete: No safe backdoors found.", Colors.Warning)
-			end
-		end)
-	end)
-end
-
--- Nút Execute Hợp Nhất (eXECButton)
-if eXECButton then
-	eXECButton.MouseButton1Click:Connect(function()
-		if not EngineState.IsAttached then 
-			logMessage("CRITICAL: Please ATTACH first!", Colors.Error) 
-			return 
+	if stats.autoMaintain then
+		if humanoid.MaxHealth ~= stats.health then humanoid.MaxHealth = stats.health end
+		if humanoid.Health ~= stats.health then humanoid.Health = stats.health end
+		if not stats.flying then
+			humanoid.WalkSpeed = stats.speed
+			humanoid.UseJumpPower = true
+			humanoid.JumpPower = stats.jump
 		end
-        if not inputSctipt then return end
-		local code = inputSctipt.Text
-		if code:gsub("%s+", "") == "" then return end
+	end
+end)
 
-		if EngineState.SSMode then
-			logMessage("SS Execution: Infiltrating via Remotes...", Colors.System)
-			task.spawn(function()
-                local executed = false
-				for _, remote in pairs(game:GetDescendants()) do
-                    if _ % 100 == 0 then RunService.Heartbeat:Wait() end
-					if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
-						local n = remote.Name:lower()
-						if (n:find("run") or n:find("load") or n:find("exec") or #n > 30) and not n:find("ban") then
-							pcall(function()
-								if remote:IsA("RemoteEvent") then remote:FireServer(code) 
-								else remote:InvokeServer(code) end
-							end)
-                            executed = true
-						end
-					end
-				end
-                if executed then logMessage("SS Payload Sent!", Colors.Success) end
-			end)
-		else
-			logMessage("Executing locally with Sandbox...", Colors.Info)
-			task.spawn(function()
-				local success, err = ExecuteWithSandbox(code)
-				if success then logMessage("Executed Successfully.", Colors.Success)
-				else logMessage(tostring(err), Colors.Error) end
-			end)
-		end
-	end)
-end
-
--- Nút Reset Mode
-if resetModeBtn then
-	resetModeBtn.MouseButton1Click:Connect(function()
-		EngineState.SSMode = false
-		if eXECButton then
-            eXECButton.Text = "EXECUTE"
-		    eXECButton.BackgroundColor3 = Colors.Info
-        end
-		logMessage("Mode Reset: Back to local execution.", Colors.Info)
-	end)
-end
-
--- Nút Remote Spy
-if spyBtn then
-    spyBtn.MouseButton1Click:Connect(function()
-        EngineState.SpyEnabled = not EngineState.SpyEnabled
-        
-        if EngineState.SpyEnabled then
-            spyBtn.BackgroundColor3 = Colors.Success
-            spyBtn.Text = "Spying: ON"
-            logMessage("Attempting to hook remotes...", Colors.Warning)
-
-            if EngineState.SpyHooked then return end
-
-            local hasMetamethod = (hookmetamethod ~= nil)
-            local hasHookFunction = (hookfunction ~= nil)
-
-            if hasMetamethod then
-                logMessage("Using High-Level Hook (Namecall)...", Colors.Success)
-                local oldNamecall
-                oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-                    local method = getnamecallmethod()
-                    if EngineState.SpyEnabled and not checkcaller() then
-                        if method == "FireServer" or method == "InvokeServer" then
-                            task.spawn(function() logMessage("[Spy] " .. self.Name .. " (" .. method .. ")", Colors.Warning) end)
-                        end
-                    end
-                    return oldNamecall(self, ...)
-                end)
-                EngineState.SpyHooked = true
-
-            elseif hasHookFunction then
-                logMessage("Fallback: Using Direct Function Hook...", Colors.Info)
-                local oldFireServer
-                oldFireServer = hookfunction(Instance.new("RemoteEvent").FireServer, function(self, ...)
-                    if EngineState.SpyEnabled and not checkcaller() then
-                        task.spawn(function() logMessage("[Spy] " .. self.Name .. " (FireServer)", Colors.Warning) end)
-                    end
-                    return oldFireServer(self, ...)
-                end)
-
-                local oldInvokeServer
-                oldInvokeServer = hookfunction(Instance.new("RemoteFunction").InvokeServer, function(self, ...)
-                    if EngineState.SpyEnabled and not checkcaller() then
-                        task.spawn(function() logMessage("[Spy] " .. self.Name .. " (InvokeServer)", Colors.Warning) end)
-                    end
-                    return oldInvokeServer(self, ...)
-                end)
-                EngineState.SpyHooked = true
-            else
-                logMessage("CRITICAL: Hooking API not supported.", Colors.Error)
-                EngineState.SpyEnabled = false
-                spyBtn.BackgroundColor3 = Colors.Error
-                spyBtn.Text = "Not Supported"
-            end
-        else
-            spyBtn.BackgroundColor3 = Colors.Error
-            spyBtn.Text = "Remote Spy"
-            logMessage("Remote Spy Paused.", Colors.Info)
-        end
-    end)
-end
-
--- ==========================================
--- 7. ANIMATION VÒNG QUAY ORBIT
--- ==========================================
-if lOGO_WHEN_ATTACHED and imageLabel_2 then
-    local orbitAngle = 0
-    RunService.RenderStepped:Connect(function(dt)
-        orbitAngle = orbitAngle + math.rad(90) * dt
-        local centerX = lOGO_WHEN_ATTACHED.AbsoluteSize.X / 2
-        local centerY = lOGO_WHEN_ATTACHED.AbsoluteSize.Y / 2
-        local newX = centerX + math.cos(orbitAngle) * 70
-        local newY = centerY + math.sin(orbitAngle) * 70
-        imageLabel_2.Position = UDim2.fromOffset(newX - imageLabel_2.Size.X.Offset / 2, newY - imageLabel_2.Size.Y.Offset / 2)
-    end)
-end
-
-logMessage("SM Engine v4.0 [-Preview-] Full Core Initialized.", Colors.Text)
+print("⚡ Stats Controller V7.1 Loaded! NoClip is now toggleable.")
