@@ -125,6 +125,7 @@ local argBox = Instance.new("TextBox", consoleFrame)
 argBox.Size = UDim2.new(1, 0, 0, 120)
 argBox.Position = UDim2.new(0, 0, 0, 40)
 argBox.MultiLine = true
+argBox.ClearTextOnFocus = false
 argBox.Text = "print('Nexus Connected')"
 argBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 argBox.TextColor3 = Color3.fromRGB(0, 255, 0)
