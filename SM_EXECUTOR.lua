@@ -262,6 +262,29 @@ local uICorner = Instance.new("UICorner")
 uICorner.Name = "UICorner"
 uICorner.Parent = tABIN
 
+local addTabBtn = Instance.new("TextButton")
+addTabBtn.Name = "TextButton"
+addTabBtn.FontFace = Font.new(
+	"rbxasset://fonts/families/FredokaOne.json",
+	Enum.FontWeight.Bold,
+	Enum.FontStyle.Italic
+)
+addTabBtn.TextColor3 = Color3.new()
+addTabBtn.Text = "+"
+addTabBtn.BackgroundColor3 = Color3.new(122, 122, 122)
+addTabBtn.TextScaled = true
+addTabBtn.BorderSizePixel = 0
+addTabBtn.Position = UDim2.new(0.953, 0, 0.095, 0)
+addTabBtn.TextWrapped = true
+addTabBtn.BorderColor3 = Color3.new()
+addTabBtn.TextSize = 14
+addTabBtn.Size = UDim2.new(0, 40, 0, 37)
+addTabBtn.Parent = tABIN
+
+local uICorneraddTabBtn = Instance.new("UICorner")
+uICorneraddTabBtn.Name = "UICorner"
+uICorneraddTabBtn.Parent = addTabBtn
+
 local textButton = Instance.new("TextButton")
 textButton.Name = "TextButton"
 textButton.FontFace = Font.new(
@@ -511,83 +534,124 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+--!strict
 -- ==========================================
--- 1. CẤU HÌNH & TRẠNG THÁI HỆ THỐNG
+-- 1. CẤU HÌNH & TRẠNG THÁI HỆ THỐNG (Đã Tối Ưu)
 -- ==========================================
+
+-- Tách biệt Cấu hình (không đổi) và Trạng thái (thay đổi liên tục)
+local Config = table.freeze({
+    MaxLogs = 150,
+    AutoExecFile = "SMEngine_AutoExec_v45.txt",
+    TweenDuration = 0.4
+})
+
 local EngineState = {
     IsAttached = false,
     IsMinimized = false,
     AutoExecEnabled = false,
     SSMode = false,
     SpyEnabled = false,
-    SpyHooked = false,
-    MaxLogs = 150,
-    AutoExecFile = "SMEngine_AutoExec_v45.txt"
+    SpyHooked = false
 }
 
-local Colors = {
+-- Sử dụng table.freeze để tránh vô tình ghi đè dữ liệu (rất quan trọng cho Executor)
+local Colors = table.freeze({
     Info = Color3.fromRGB(0, 170, 255),
     Success = Color3.fromRGB(0, 255, 100),
     Warning = Color3.fromRGB(255, 170, 0),
     Error = Color3.fromRGB(255, 50, 50),
     Text = Color3.fromRGB(240, 240, 240),
     System = Color3.fromRGB(170, 85, 255)
-}
+})
 
-local TrapKeywords = {"ban", "kick", "detect", "anticheat", "security", "log", "report"}
-local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+local TrapKeywords = table.freeze({
+    "ban", "kick", "detect", "anticheat", "security", "log", "report"
+})
 
+-- Kế thừa từ Config để dễ dàng quản lý thông số animation tại một nơi
+local tInfo = TweenInfo.new(Config.TweenDuration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
+--!strict
 -- ==========================================
--- 2. HỆ THỐNG FILE & LOGGER
+-- 2. HỆ THỐNG FILE & LOGGER (Đã Tối Ưu)
 -- ==========================================
-local function safeWriteFile(name, content)
-    if writefile then pcall(function() writefile(name, content) end) end
+
+-- 1. Tối ưu pcall: Truyền trực tiếp hàm vào pcall thay vì tạo hàm nặc danh (anonymous function)
+local function safeWriteFile(name: string, content: string): boolean
+    if writefile then 
+        local success = pcall(writefile, name, content)
+        return success
+    end
+    return false
 end
-local function safeReadFile(name)
-    if readfile and isfile and isfile(name) then
-        local s, c = pcall(function() return readfile(name) end)
-        if s then return c end
+
+local function safeReadFile(name: string): string?
+    if isfile and isfile(name) and readfile then
+        local success, content = pcall(readfile, name)
+        if success then 
+            return content 
+        end
     end
     return nil
 end
 
-local LogHistory = {}
-local function logMessage(text, colorType)
+local LogHistory: {string} = {}
+
+local function logMessage(text: any, colorType: Color3?)
     local color = colorType or Colors.Text
     local stamp = string.format("<font color=\"#888888\">[%s]</font>", os.date("%X"))
-    local hex = string.format("#%02X%02X%02X", color.R*255, color.G*255, color.B*255)
-    local msg = string.format("\n%s <font color=\"%s\">[>] %s</font>", stamp, hex, tostring(text))
+    
+    -- 2. Tối ưu Color3: Sử dụng hàm ToHex() có sẵn của Luau (Nhanh và gọn hơn toán học thủ công)
+    local hex = color:ToHex()
+    local msg = string.format("\n%s <font color=\"#%s\">[>] %s</font>", stamp, hex, tostring(text))
 
     table.insert(LogHistory, msg)
-    if #LogHistory > EngineState.MaxLogs then table.remove(LogHistory, 1) end
+    
+    -- Lưu ý: Dùng Config.MaxLogs từ phần 1 đã tối ưu thay vì EngineState
+    if #LogHistory > Config.MaxLogs then 
+        table.remove(LogHistory, 1) 
+    end
 
     if output_2 then
         output_2.Text = table.concat(LogHistory, "")
-        pcall(function()
+        
+        -- 3. Tối ưu UI Scrolling: Dùng task.defer để tránh lỗi TextBounds cập nhật chậm
+        task.defer(function()
             local scroll = output_2.Parent
             if scroll and scroll:IsA("ScrollingFrame") then
-                scroll.CanvasPosition = Vector2.new(0, scroll.AbsoluteCanvasSize.Y)
+                -- Ép cuộn xuống đáy. Dùng 999999 an toàn và nhẹ hơn việc gọi AbsoluteCanvasSize.Y
+                -- vì đôi khi UI chưa kịp render kích thước mới sau khi gán Text.
+                scroll.CanvasPosition = Vector2.new(0, 999999)
             end
         end)
     else
-        print("[SM v4.5] " .. tostring(text))
+        print(string.format("[SM v4.6] %s", tostring(text)))
     end
 end
 
 -- ==========================================
--- 3. HỆ THỐNG SANDBOX NÂNG CAO v4.6 (COMPATIBILITY MODE)
+-- 3. HỆ THỐNG SANDBOX NÂNG CAO v4.7 (OPTIMIZED COMPATIBILITY MODE)
 -- ==========================================
--- Sử dụng getgenv thực của Executor để đảm bảo tương thích với script lớn
 local RealGenv = (getgenv and getgenv()) or _G
+local RealEnv = getfenv(0) -- Cache lại môi trường gốc để tránh gọi hàm nhiều lần
+
+-- Cache sẵn các Services thường dùng
+local RealGame = game
+local CoreGui = RealGame:GetService("CoreGui")
+local Players = RealGame:GetService("Players")
+
+-- Tối ưu hóa request API
+local httpRequest = request or http_request or (syn and syn.request)
 
 local MockAPI = {
     -- Basic API & Compatibility
     ["getgenv"] = function() return RealGenv end,
-    ["getrenv"] = function() return getfenv(0) end,
-    ["identifyexecutor"] = function() return "SMEngine", "4.6" end,
+    ["getrenv"] = function() return RealEnv end,
+    ["identifyexecutor"] = function() return "SMEngine", "4.7" end,
     ["checkcaller"] = checkcaller or function() return true end,
     
-    -- Metadata Functions (Bắt buộc cho script lớn)
+    -- Metadata Functions
     ["setreadonly"] = setreadonly or function() return true end,
     ["make_writeable"] = make_writeable or function() return true end,
     ["getrawmetatable"] = getrawmetatable or function(o) return getmetatable(o) end,
@@ -598,11 +662,40 @@ local MockAPI = {
     ["readfile"] = readfile or function(n) return readfile and readfile(n) or "" end,
     
     -- Advanced (UNC)
-    ["request"] = request or http_request or (syn and syn.request),
+    ["request"] = httpRequest,
     ["gethui"] = gethui or function() 
-        return game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui") or game:GetService("CoreGui") 
+        local lp = Players.LocalPlayer
+        return (lp and lp:FindFirstChild("PlayerGui")) or CoreGui 
     end,
 }
+
+-- [QUAN TRỌNG] Cache MockGame thay vì tạo mới mỗi lần gọi
+local MockGame = setmetatable({}, {
+    __index = function(_, key)
+        -- Chặn và custom các hàm nhạy cảm
+        if key == "GetService" or key == "service" then
+            return function(self, sName) return RealGame:GetService(sName) end
+        elseif key == "HttpGet" or key == "HttpGetAsync" then
+            return function(self, url, ...) return RealGame:HttpGet(url, ...) end
+        elseif key == "GetObjects" then
+            return function(self, asset) return RealGame:GetObjects(asset) end
+        end
+        
+        -- Fallback về game thật an toàn, bảo toàn tham số 'self' (C Instance)
+        local val = RealGame[key]
+        if type(val) == "function" then
+            return function(self, ...) return val(RealGame, ...) end
+        end
+        return val
+    end,
+    __newindex = function(_, key, val)
+        RealGame[key] = val
+    end,
+    __metatable = "Locked"
+})
+
+-- Đưa MockGame vào MockAPI để tra cứu O(1)
+MockAPI.game = MockGame
 
 local function ExecuteWithSandbox(code)
     local load = loadstring or (getgenv and getgenv().loadstring)
@@ -611,78 +704,125 @@ local function ExecuteWithSandbox(code)
     local func, compileError = load(code)
     if not func then return false, "Syntax Error: " .. tostring(compileError) end
 
-    local env = getfenv(func)
-    -- Metatable Bypass: Nếu không tìm thấy trong Sandbox, nó sẽ tự tìm ở môi trường thực (RealGenv)
-    local sandbox = setmetatable({}, {
+    -- Metatable Lookup siêu tốc
+    local sandboxEnv = setmetatable({}, {
         __index = function(_, k)
-            if MockAPI[k] then return MockAPI[k] end
-            if k == "game" then
-                return setmetatable({}, {
-                    __index = function(_, gameKey)
-                        -- Đặc biệt quan trọng cho script lớn: Xử lý GetService và HttpGet
-                        if gameKey == "GetService" then
-                            return function(self, sName) return game:GetService(sName) end
-                        elseif gameKey == "HttpGet" then
-                            return function(self, ...) return game:HttpGet(...) end
-                        end
-                        local s, r = pcall(function() return game[gameKey] end)
-                        return s and r or nil
-                    end
-                })
-            end
-            return RealGenv[k] or env[k]
+            -- 1. Ưu tiên tìm trong MockAPI trước (O(1))
+            local mocked = MockAPI[k]
+            if mocked ~= nil then return mocked end
+            
+            -- 2. Tìm trong getgenv() thật
+            local genvVal = RealGenv[k]
+            if genvVal ~= nil then return genvVal end
+            
+            -- 3. Fallback cuối cùng về Roblox Environment
+            return RealEnv[k]
         end,
         __newindex = function(_, k, v) 
-            RealGenv[k] = v -- Cho phép script lưu biến vào getgenv() thật
+            -- Vẫn giữ nguyên logic: lưu biến vào getgenv() thật
+            RealGenv[k] = v 
         end
     })
 
-    setfenv(func, sandbox)
-    return pcall(func)
+    setfenv(func, sandboxEnv)
+    
+    -- Sử dụng xpcall thay vì pcall để lấy Traceback (Rất quan trọng khi chạy script lớn)
+    local success, result = xpcall(func, function(err)
+        return "Runtime Error: " .. tostring(err) .. "\n" .. debug.traceback()
+    end)
+
+    return success, result
 end
 
 -- ==========================================
--- 4. HỆ THỐNG KÉO THẢ TỐI ƯU
+-- 4. HỆ THỐNG KÉO THẢ TỐI ƯU (V4.9 SM-SMOOTH)
 -- ==========================================
-local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local function makeDraggableSmooth(mainFrame, arg2, arg3)
     if not mainFrame then return end
-    attachedObjects = type(attachedObjects) == "table" and attachedObjects or {}
-    lerpSpeed = lerpSpeed or 0.15
+    
+    -- Xử lý tham số linh hoạt
+    local attachedObjects = type(arg2) == "table" and arg2 or {}
+    local lerpSpeed = type(arg2) == "number" and arg2 or (type(arg3) == "number" and arg3 or 0.18)
 
-    local dragging, dragStart = false, nil
-    local startPositions = {}
-    local renderConnection = nil
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    
+    local targetPos = mainFrame.Position
+    local attachedOffsets = {} -- Lưu khoảng cách tương đối của các object đi kèm
 
+    -- Cập nhật mục tiêu di chuyển
+    local function update(input)
+        local delta = input.Position - dragStart
+        -- Tính toán vị trí mới dựa trên vị trí bắt đầu + độ dời chuột
+        targetPos = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X, 
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
+
+    -- Bắt đầu nhấn
     mainFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             dragging = true
             dragStart = input.Position
-            startPositions[mainFrame] = mainFrame.Position
-            for _, obj in ipairs(attachedObjects) do startPositions[obj] = obj.Position end
+            startPos = mainFrame.Position
+            
+            -- Ghi nhớ vị trí tương đối của các con (nếu có)
+            table.clear(attachedOffsets)
+            for _, obj in ipairs(attachedObjects) do
+                attachedOffsets[obj] = obj.Position
+            end
 
-            if renderConnection then renderConnection:Disconnect() end
-            renderConnection = RunService.RenderStepped:Connect(function()
-                local lastInput = UserInputService:GetMouseLocation()
-                local container = mainFrame.Parent
-                local scale = (container and container:FindFirstChildOfClass("UIScale") and container:FindFirstChildOfClass("UIScale").Scale) or 1
-                local delta = (Vector3.new(lastInput.X, lastInput.Y - 36, 0) - dragStart) / scale
+            -- Vòng lặp Lerp mượt mà
+            local connection
+            connection = RunService.RenderStepped:Connect(function(dt)
+                if not mainFrame or not mainFrame.Parent then 
+                    connection:Disconnect() 
+                    return 
+                end
+
+                -- Công thức Lerp chuẩn hóa theo Frame Time
+                local alpha = 1 - math.pow(1 - lerpSpeed, dt * 60)
                 
-                if dragging then
-                    local sPosMain = startPositions[mainFrame]
-                    mainFrame.Position = mainFrame.Position:Lerp(UDim2.new(sPosMain.X.Scale, sPosMain.X.Offset + delta.X, sPosMain.Y.Scale, sPosMain.Y.Offset + delta.Y), lerpSpeed)
-                    for _, obj in ipairs(attachedObjects) do
-                        local sPos = startPositions[obj]
-                        if sPos then
-                            obj.Position = obj.Position:Lerp(UDim2.new(sPos.X.Scale, sPos.X.Offset + delta.X, sPos.Y.Scale, sPos.Y.Offset + delta.Y), lerpSpeed)
-                        end
+                -- Di chuyển Main Frame
+                mainFrame.Position = mainFrame.Position:Lerp(targetPos, alpha)
+                
+                -- Di chuyển các Attached Objects theo tỉ lệ tương ứng
+                for obj, originalPos in pairs(attachedOffsets) do
+                    local deltaX = targetPos.X.Offset - startPos.X.Offset
+                    local deltaY = targetPos.Y.Offset - startPos.Y.Offset
+                    local objTarget = UDim2.new(
+                        originalPos.X.Scale, originalPos.X.Offset + deltaX,
+                        originalPos.Y.Scale, originalPos.Y.Offset + deltaY
+                    )
+                    obj.Position = obj.Position:Lerp(objTarget, alpha)
+                end
+
+                -- Tự dọn dẹp khi đã đứng yên và ngừng kéo
+                if not dragging then
+                    local mag = (Vector2.new(mainFrame.Position.X.Offset, mainFrame.Position.Y.Offset) - 
+                                 Vector2.new(targetPos.X.Offset, targetPos.Y.Offset)).Magnitude
+                    if mag < 0.1 then
+                        mainFrame.Position = targetPos
+                        connection:Disconnect()
                     end
-                else
-                    if renderConnection then renderConnection:Disconnect() renderConnection = nil end
                 end
             end)
         end
     end)
 
+    -- Lắng nghe di chuyển toàn cầu (Tránh lỗi tuột chuột)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            update(input)
+        end
+    end)
+
+    -- Ngừng kéo toàn cầu
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
@@ -690,10 +830,12 @@ local function makeDraggableSmooth(mainFrame, attachedObjects, lerpSpeed)
     end)
 end
 
+-- Sử dụng thực tế
 pcall(function()
-    makeDraggableSmooth(main, 0.2)
-    makeDraggableSmooth(exec, 0.2)
-    makeDraggableSmooth(output, 0.2)
+    -- main, exec, output là các biến Frame của bạn
+    makeDraggableSmooth(main, 0.18)
+    makeDraggableSmooth(exec, 0.18)
+    makeDraggableSmooth(output, 0.18)
 end)
 
 -- ==========================================
@@ -701,7 +843,7 @@ end)
 -- ==========================================
 if closeButton then
     closeButton.MouseButton1Click:Connect(function()
-        logMessage("Shutting down SM v4.5...", Colors.Warning)
+        logMessage("Shutting down SM v4.6...", Colors.Warning)
         if imageLabel_2 then imageLabel_2.Visible = false end
         if main then TweenService:Create(main, tInfo, {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}):Play() end
         task.wait(0.5)
@@ -760,59 +902,78 @@ if clearlog then
 end
 
 -- ==========================================
--- 6. LÕI THỰC THI & QUÉT TOÀN BỘ GAME (FULL SCAN)
+-- 6. LÕI THỰC THI & QUÉT TỐI ƯU (V4.6 OPTIMIZED)
 -- ==========================================
 
+-- Bảng lưu trữ tạm thời để tăng tốc thực thi
+local ScannedRemotes = {}
+
+-- Hàm hỗ trợ lọc từ khóa (Optimization: sử dụng bảng băm nếu cần, nhưng ở đây dùng logic find là ổn)
+local function isVulnerable(name)
+    local n = name:lower()
+    for _, word in ipairs(TrapKeywords) do
+        if n:find(word) then return false, true end -- Là Trap
+    end
+    -- Kiểm tra dấu hiệu SS Backdoor
+    if n:find("run") or n:find("load") or n:find("exec") or n:find("script") or #n > 30 then
+        return true, false
+    end
+    return false, false
+end
+
+-- 1. XỬ LÝ ATTACH
 if textButton then
     textButton.MouseButton1Click:Connect(function()
-        if EngineState.IsAttached then logMessage("Already attached!", Colors.Warning) return end
+        if EngineState.IsAttached then 
+            logMessage("Status: Already linked.", Colors.Info) 
+            return 
+        end
+        
         textButton.Text = "INJECTING..."
-        textButton.BackgroundColor3 = Color3.fromRGB(200, 200, 0)
-        logMessage("Bypassing Environment v4.5...", Colors.Warning)
-
-        task.spawn(function()
-            task.wait(1.2)
+        textButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+        
+        task.delay(1, function()
             EngineState.IsAttached = true
             textButton.Text = "ATTACHED"
             textButton.BackgroundColor3 = Colors.Success
-            logMessage("Attached Successfully! System Ready.", Colors.Success)
+            logMessage("Bypass Environment v4.5 Active.", Colors.Success)
 
             if EngineState.AutoExecEnabled then
-                local savedScript = safeReadFile(EngineState.AutoExecFile)
-                if savedScript and savedScript ~= "" then
-                    logMessage("Running Auto-Exec payload...", Colors.System)
-                    ExecuteWithSandbox(savedScript)
+                local payload = safeReadFile(EngineState.AutoExecFile)
+                if payload and #payload > 0 then
+                    logMessage("Executing Auto-Exec...", Colors.System)
+                    ExecuteWithSandbox(payload)
                 end
             end
         end)
     end)
 end
 
+-- 2. QUÉT TOÀN BỘ GAME (FULL SCAN)
 if textButton_2 then
     textButton_2.MouseButton1Click:Connect(function()
-        logMessage("Full Game Scan Initiated... This may take a moment.", Colors.Warning)
+        if not EngineState.IsAttached then logMessage("Attach first!", Colors.Error) return end
+        
+        logMessage("Deep Scan started...", Colors.Warning)
+        table.clear(ScannedRemotes)
         local foundCount = 0
-
+        
         task.spawn(function()
-            -- Lấy TOÀN BỘ Descendants trong game
             local allObjects = game:GetDescendants()
-            local totalObjects = #allObjects
+            local total = #allObjects
             
             for i, item in ipairs(allObjects) do
-                -- Anti-Crash: Ép nghỉ sau mỗi 500 vòng lặp để tránh treo máy
-                if i % 500 == 0 then RunService.Heartbeat:Wait() end 
+                -- Anti-Lag: Cứ mỗi 400 object thì nhường CPU 1 khung hình
+                if i % 400 == 0 then RunService.Heartbeat:Wait() end
                 
                 if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
-                    local name = item.Name:lower()
-                    local isTrap = false
-                    for _, word in ipairs(TrapKeywords) do
-                        if name:find(word) then isTrap = true break end
-                    end
-
+                    local isVuln, isTrap = isVulnerable(item.Name)
+                    
                     if isTrap then
-                        logMessage("⚠️ TRAP DETECTED: " .. item.GetFullName(item), Colors.Error)
-                    elseif name:find("run") or name:find("load") or name:find("exec") or #name > 30 then
-                        logMessage("✅ Vulnerable Found: " .. item.Name, Colors.Success)
+                        logMessage("⚠️ TRAP: " .. item:GetFullName(), Colors.Error)
+                    elseif isVuln then
+                        table.insert(ScannedRemotes, item)
+                        logMessage("✅ Found: " .. item.Name, Colors.Success)
                         foundCount = foundCount + 1
                     end
                 end
@@ -821,112 +982,76 @@ if textButton_2 then
             if foundCount > 0 then
                 EngineState.SSMode = true
                 if eXECButton then
-                    eXECButton.Text = "EXECUTE (SS)"
+                    eXECButton.Text = "EXECUTE (SS: " .. foundCount .. ")"
                     eXECButton.BackgroundColor3 = Colors.System
                 end
-                logMessage("Scan Complete! Analyzed " .. totalObjects .. " instances. Found " .. foundCount .. " safe backdoors.", Colors.Success)
+                logMessage("Scan Finish. Found " .. foundCount .. " potential remotes.", Colors.Success)
             else
-                logMessage("Scan Complete! Analyzed " .. totalObjects .. " instances. No safe backdoors found.", Colors.Warning)
+                logMessage("Scan Finish. No backdoors detected.", Colors.Warning)
             end
         end)
     end)
 end
 
+-- 3. THỰC THI (EXECUTE)
 if eXECButton then
     eXECButton.MouseButton1Click:Connect(function()
-        if not EngineState.IsAttached then logMessage("CRITICAL: Please ATTACH first!", Colors.Error) return end
-        if not inputSctipt then return end
-        local code = inputSctipt.Text
+        if not EngineState.IsAttached then logMessage("Please ATTACH first!", Colors.Error) return end
+        local code = inputSctipt and inputSctipt.Text or ""
         if code:gsub("%s+", "") == "" then return end
 
         if EngineState.SSMode then
-            logMessage("SS Execution: Infiltrating via Remotes...", Colors.System)
+            if #ScannedRemotes == 0 then
+                logMessage("No Remotes in cache. Rescan recommended.", Colors.Warning)
+                return
+            end
+
+            logMessage("SS Infiltration: Sending Payload...", Colors.System)
             task.spawn(function()
-                local executed = false
-                local allObjects = game:GetDescendants()
-                
-                for i, remote in ipairs(allObjects) do
-                    if i % 500 == 0 then RunService.Heartbeat:Wait() end
-                    if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
-                        local n = remote.Name:lower()
-                        if (n:find("run") or n:find("load") or n:find("exec") or #n > 30) and not n:find("ban") then
-                            pcall(function()
-                                if remote:IsA("RemoteEvent") then remote:FireServer(code) 
-                                else remote:InvokeServer(code) end
-                            end)
-                            executed = true
+                for _, remote in ipairs(ScannedRemotes) do
+                    pcall(function()
+                        if remote:IsA("RemoteEvent") then
+                            remote:FireServer(code)
+                        elseif remote:IsA("RemoteFunction") then
+                            remote:InvokeServer(code)
                         end
-                    end
+                    end)
                 end
-                if executed then logMessage("SS Payload Sent!", Colors.Success) end
+                logMessage("Payload broadcasted to " .. #ScannedRemotes .. " remotes.", Colors.Success)
             end)
         else
-            logMessage("Executing locally (v4.5 Sandbox)...", Colors.Info)
-            task.spawn(function()
-                local success, err = ExecuteWithSandbox(code)
-                if success then logMessage("Executed Successfully.", Colors.Success)
-                else logMessage(tostring(err), Colors.Error) end
-            end)
+            logMessage("Running in Local Sandbox...", Colors.Info)
+            local success, err = ExecuteWithSandbox(code)
+            if not success then logMessage("Error: " .. tostring(err), Colors.Error) end
         end
     end)
 end
 
-if resetModeBtn then
-    resetModeBtn.MouseButton1Click:Connect(function()
-        EngineState.SSMode = false
-        if eXECButton then
-            eXECButton.Text = "EXECUTE"
-            eXECButton.BackgroundColor3 = Colors.Info
-        end
-        logMessage("Mode Reset: Back to local execution.", Colors.Info)
-    end)
-end
-
+-- 4. REMOTE SPY (OPTIMIZED)
 if spyBtn then
     spyBtn.MouseButton1Click:Connect(function()
         EngineState.SpyEnabled = not EngineState.SpyEnabled
-        if EngineState.SpyEnabled then
-            spyBtn.BackgroundColor3 = Colors.Success
-            spyBtn.Text = "Spying: ON"
-            logMessage("Attempting to hook remotes...", Colors.Warning)
+        spyBtn.BackgroundColor3 = EngineState.SpyEnabled and Colors.Success or Colors.Error
+        spyBtn.Text = EngineState.SpyEnabled and "Spying: ON" or "Remote Spy"
 
-            if EngineState.SpyHooked then return end
-
+        if EngineState.SpyEnabled and not EngineState.SpyHooked then
             if hookmetamethod then
-                logMessage("Using High-Level Hook (Namecall)...", Colors.Success)
                 local oldNamecall
                 oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
                     local method = getnamecallmethod()
                     if EngineState.SpyEnabled and not checkcaller() then
                         if method == "FireServer" or method == "InvokeServer" then
-                            local rName = self.Name
-                            task.spawn(function() logMessage("[Spy] " .. rName .. " (" .. method .. ")", Colors.Warning) end)
+                            -- Ghi log tối giản nhưng hiệu quả
+                            task.spawn(logMessage, string.format("[Spy] %s | Method: %s", self.Name, method), Colors.Warning)
                         end
                     end
                     return oldNamecall(self, ...)
                 end)
                 EngineState.SpyHooked = true
-            elseif hookfunction then
-                logMessage("Fallback: Using Direct Function Hook...", Colors.Info)
-                local oldFireServer
-                oldFireServer = hookfunction(Instance.new("RemoteEvent").FireServer, function(self, ...)
-                    if EngineState.SpyEnabled and not checkcaller() then
-                        local rName = self.Name
-                        task.spawn(function() logMessage("[Spy] " .. rName .. " (FireServer)", Colors.Warning) end)
-                    end
-                    return oldFireServer(self, ...)
-                end)
-                EngineState.SpyHooked = true
+                logMessage("Namecall hook injected.", Colors.Success)
             else
-                logMessage("CRITICAL: Hooking API not supported.", Colors.Error)
-                EngineState.SpyEnabled = false
-                spyBtn.BackgroundColor3 = Colors.Error
-                spyBtn.Text = "Not Supported"
+                logMessage("Fail: Executor lacks hookmetamethod.", Colors.Error)
             end
-        else
-            spyBtn.BackgroundColor3 = Colors.Error
-            spyBtn.Text = "Remote Spy"
-            logMessage("Remote Spy Paused.", Colors.Info)
         end
     end)
 end
@@ -952,179 +1077,208 @@ if lOGO_WHEN_ATTACHED and imageLabel_2 then
 end
 
 -- ==========================================
--- 8. CORE QUẢN LÝ TAB v4.8 (FIX OVERFLOW & FILE SYSTEM)
+-- 8. CORE QUẢN LÝ TAB v4.9 (AUTO-LOAD & REFRESH SYSTEM)
 -- ==========================================
 
 local TabSystem = {
     Tabs = {}, 
     CurrentTabIndex = 1,
     ConfigFolder = "SMEngine_Workspace",
-    ActiveTabColor = Color3.fromRGB(100, 100, 100),
-    InactiveTabColor = Color3.fromRGB(45, 45, 45)
+    ActiveTabColor = Color3.fromRGB(70, 70, 70),
+    InactiveTabColor = Color3.fromRGB(35, 35, 35)
 }
 
+-- Khởi tạo thư mục
 if makefolder then pcall(makefolder, TabSystem.ConfigFolder) end
 
+-- UI Elements Setup
 tABIN:ClearAllChildren() 
 local tabScroll = Instance.new("ScrollingFrame")
-tabScroll.Size = UDim2.new(1, -40, 1, 0) 
+tabScroll.Size = UDim2.new(1, -45, 1, 0) 
 tabScroll.BackgroundTransparency = 1
-tabScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 tabScroll.ScrollBarThickness = 2
-tabScroll.ScrollingDirection = Enum.ScrollingDirection.X -- ĐÃ FIX: Chuyển sang X
+tabScroll.ScrollingDirection = Enum.ScrollingDirection.X
 tabScroll.AutomaticCanvasSize = Enum.AutomaticSize.X
 tabScroll.Parent = tABIN
 
 local tabLayout = Instance.new("UIListLayout")
 tabLayout.FillDirection = Enum.FillDirection.Horizontal
-tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-tabLayout.Padding = UDim.new(0, 5)
+tabLayout.Padding = UDim.new(0, 4)
 tabLayout.Parent = tabScroll
 
--- Nút Thêm Tab (+) nằm ngoài Scroll để luôn cố định
-local addTabBtn = Instance.new("TextButton")
-addTabBtn.Size = UDim2.new(0, 35, 0, 35)
-addTabBtn.Position = UDim2.new(1, -35, 0, 3)
-addTabBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-addTabBtn.Text = "+"
-addTabBtn.TextColor3 = Color3.new(1, 1, 1)
-addTabBtn.TextSize = 20
-addTabBtn.Parent = tABIN
-Instance.new("UICorner", addTabBtn).CornerRadius = UDim.new(0, 6)
-
--- MENU NGỮ CẢNH (Rename/Delete Popup)
-local contextMenu = Instance.new("Frame")
-contextMenu.Size = UDim2.new(0, 120, 0, 70)
-contextMenu.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-contextMenu.BorderSizePixel = 1
-contextMenu.Visible = false
-contextMenu.ZIndex = 10
-contextMenu.Parent = screenGui
-Instance.new("UICorner", contextMenu)
-
-local function createMenuBtn(name, color, pos)
-    local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, -10, 0, 25)
-    b.Position = UDim2.new(0, 5, 0, pos)
-    b.BackgroundColor3 = color
-    b.Text = name
-    b.TextColor3 = Color3.new(1,1,1)
-    b.TextSize = 12
-    b.Parent = contextMenu
-    Instance.new("UICorner", b)
-    return b
-end
-
-local renameBtn = createMenuBtn("Rename", Color3.fromRGB(80, 80, 150), 5)
-local deleteBtn = createMenuBtn("Delete", Color3.fromRGB(150, 50, 50), 35)
-
--- HÀM CHÍNH
-local function saveAll()
-    if TabSystem.Tabs[TabSystem.CurrentTabIndex] then
-        TabSystem.Tabs[TabSystem.CurrentTabIndex].Content = inputSctipt.Text
+-- 1. HÀM LƯU FILE (WRITE)
+local function saveTabToFile(tabData)
+    if writefile then
+        local path = TabSystem.ConfigFolder .. "/" .. tabData.Name .. ".lua"
+        pcall(writefile, path, tabData.Content)
     end
 end
 
-local function createTabUI(index)
-    local data = TabSystem.Tabs[index]
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 110, 0, 32)
-    btn.BackgroundColor3 = (TabSystem.CurrentTabIndex == index) and TabSystem.ActiveTabColor or TabSystem.InactiveTabColor
-    btn.Text = data.Name
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextTruncate = Enum.TextTruncate.AtEnd
-    btn.Parent = tabScroll
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+-- 2. HÀM VẼ LẠI TOÀN BỘ TAB (REFRESH UI)
+local function refreshTabs()
+    -- Xóa các nút cũ
+    for _, child in ipairs(tabScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
 
-    -- Chuyển Tab
-    btn.MouseButton1Click:Connect(function()
-        saveAll()
-        TabSystem.CurrentTabIndex = index
-        inputSctipt.Text = data.Content
-        for i, t in ipairs(TabSystem.Tabs) do
-            t.Button.BackgroundColor3 = (i == index) and TabSystem.ActiveTabColor or TabSystem.InactiveTabColor
-        end
-        contextMenu.Visible = false
-    end)
+    for index, data in ipairs(TabSystem.Tabs) do
+        local btn = Instance.new("TextButton")
+        btn.Name = "Tab_" .. index
+        btn.Size = UDim2.new(0, 110, 0, 30)
+        btn.BackgroundColor3 = (TabSystem.CurrentTabIndex == index) and TabSystem.ActiveTabColor or TabSystem.InactiveTabColor
+        btn.Text = data.Name
+        btn.TextColor3 = (TabSystem.CurrentTabIndex == index) and Color3.new(1,1,1) or Color3.fromRGB(180, 180, 180)
+        btn.Font = Enum.Font.SourceSansBold
+        btn.TextTruncate = Enum.TextTruncate.AtEnd
+        btn.Parent = tabScroll
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
 
-    -- Mở Menu Rename/Delete (Chuột phải hoặc giữ)
-    btn.MouseButton2Click:Connect(function()
-        contextMenu.Position = UDim2.new(0, btn.AbsolutePosition.X, 0, btn.AbsolutePosition.Y + 35)
-        contextMenu.Visible = true
-        
-        -- Xử lý Rename
-        renameBtn.MouseButton1Click:Once(function()
-            contextMenu.Visible = false
-            logMessage("Nhập tên mới vào Editor và nhấn SAVE để Rename!", Colors.Warning)
-            -- Logic: Lấy text từ editor làm tên mới
-        end)
-
-        -- Xử lý Delete
-        deleteBtn.MouseButton1Click:Once(function()
-            if #TabSystem.Tabs > 1 then
-                if isfile and isfile(TabSystem.ConfigFolder.."/"..data.Name..".lua") then
-                    delfile(TabSystem.ConfigFolder.."/"..data.Name..".lua")
-                end
-                table.remove(TabSystem.Tabs, index)
-                btn:Destroy()
-                contextMenu.Visible = false
-                logMessage("Deleted Tab: "..data.Name, Colors.Error)
+        -- Click: Chuyển Tab
+        btn.MouseButton1Click:Connect(function()
+            -- Lưu nội dung tab cũ trước khi chuyển
+            if TabSystem.Tabs[TabSystem.CurrentTabIndex] then
+                TabSystem.Tabs[TabSystem.CurrentTabIndex].Content = inputSctipt.Text
             end
+            
+            TabSystem.CurrentTabIndex = index
+            inputSctipt.Text = data.Content
+            refreshTabs() -- Cập nhật màu sắc
+            contextMenu.Visible = false
         end)
-    end)
-    
-    return btn
+
+        -- Chuột phải: Mở Menu
+        btn.MouseButton2Click:Connect(function()
+            contextMenu.Position = UDim2.new(0, btn.AbsolutePosition.X, 0, btn.AbsolutePosition.Y + 35)
+            contextMenu.Visible = true
+            
+            -- Gán sự kiện cho nút trong Menu (Dùng Connection tạm thời)
+            local renameConn, deleteConn
+            
+            renameConn = renameBtn.MouseButton1Click:Connect(function()
+                renameConn:Disconnect()
+                deleteConn:Disconnect()
+                contextMenu.Visible = false
+                
+                local newName = inputSctipt.Text:sub(1, 15):gsub("[^%w%s]", "") -- Lấy 15 ký tự đầu làm tên
+                if newName == "" then newName = "Untitled" end
+                
+                -- Xóa file cũ, tạo file mới
+                if delfile then pcall(delfile, TabSystem.ConfigFolder .. "/" .. data.Name .. ".lua") end
+                data.Name = newName
+                saveTabToFile(data)
+                refreshTabs()
+                logMessage("Renamed to: " .. newName, Colors.Success)
+            end)
+
+            deleteConn = deleteBtn.MouseButton1Click:Connect(function()
+                renameConn:Disconnect()
+                deleteConn:Disconnect()
+                contextMenu.Visible = false
+                
+                if #TabSystem.Tabs > 1 then
+                    if delfile then pcall(delfile, TabSystem.ConfigFolder .. "/" .. data.Name .. ".lua") end
+                    table.remove(TabSystem.Tabs, index)
+                    if TabSystem.CurrentTabIndex > #TabSystem.Tabs then TabSystem.CurrentTabIndex = #TabSystem.Tabs end
+                    inputSctipt.Text = TabSystem.Tabs[TabSystem.CurrentTabIndex].Content
+                    refreshTabs()
+                else
+                    logMessage("Cannot delete the last tab!", Colors.Error)
+                end
+            end)
+        end)
+    end
 end
 
+-- 3. HÀM THÊM TAB MỚI
 local function addNewTab(name, content, skipSave)
-    local newIndex = #TabSystem.Tabs + 1
     local tabData = {
-        Name = name or "Script " .. newIndex,
-        Content = content or "-- SM Engine v4.8",
-        Button = nil
+        Name = name or "Script " .. (#TabSystem.Tabs + 1),
+        Content = content or "-- New Script",
     }
     table.insert(TabSystem.Tabs, tabData)
-    tabData.Button = createTabUI(newIndex)
-    
-    if not skipSave and writefile then
-        pcall(function() writefile(TabSystem.ConfigFolder.."/"..tabData.Name..".lua", tabData.Content) end)
-    end
+    if not skipSave then saveTabToFile(tabData) end
+    refreshTabs()
 end
 
--- ==========================================
--- AUTO-LOAD TỪ WORKSPACE
--- ==========================================
-local function loadWorkspaceFiles()
+-- 4. AUTO-LOAD TỪ FOLDER (CỰC KỲ HỮU ÍCH)
+local function loadSavedTabs()
     if listfiles then
         local files = listfiles(TabSystem.ConfigFolder)
         if #files > 0 then
-            for _, file in ipairs(files) do
-                if file:sub(-4) == ".lua" then
-                    local name = file:gsub(TabSystem.ConfigFolder.."/", ""):gsub(".lua", "")
-                    local content = readfile(file)
+            for _, path in ipairs(files) do
+                if path:sub(-4) == ".lua" then
+                    local name = path:gsub(TabSystem.ConfigFolder.."/", ""):gsub(".lua", "")
+                    local content = readfile(path)
                     addNewTab(name, content, true)
                 end
             end
         else
-            addNewTab("Main", "-- Welcome")
+            addNewTab("Main.lua", "-- Welcome to SM Engine")
         end
     else
-        addNewTab("Main", "-- Executor not support listfiles")
+        addNewTab("Main.lua", "-- No File System Support")
+    end
+    -- Set tab đầu tiên làm mặc định
+    if TabSystem.Tabs[1] then
+        inputSctipt.Text = TabSystem.Tabs[1].Content
+        refreshTabs()
     end
 end
 
-addTabBtn.MouseButton1Click:Connect(function() addNewTab() end)
+-- 5. NÚT ADD (+) CỐ ĐỊNH
+addTabBtn.MouseButton1Click:Connect(function()
+    addNewTab()
+    logMessage("New tab created.", Colors.Info)
+end)
 
--- Khởi chạy load file
-task.spawn(loadWorkspaceFiles)
+-- Chạy khởi động
+loadSavedTabs()
 
--- Tắt menu khi nhấn ra ngoài
-UserInputService.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 and contextMenu.Visible then
-        task.wait(0.1)
-        contextMenu.Visible = false
+-- ==========================================
+-- 8.1. AUTO-LOAD TỪ WORKSPACE (V4.9.1 OPTIMIZED)
+-- ==========================================
+
+local function loadWorkspaceFiles()
+    if not listfiles then
+        addNewTab("Main", "-- Executor doesn't support listfiles")
+        return
+    end
+
+    logMessage("Scanning Workspace...", Colors.Info)
+    
+    local success, files = pcall(listfiles, TabSystem.ConfigFolder)
+    if not success or #files == 0 then
+        addNewTab("Main", "-- Welcome to SMEngine\n-- Start coding here!")
+        return
+    end
+
+    -- Sắp xếp file theo tên (A-Z) để UI trông gọn gàng
+    table.sort(files)
+
+    for _, filePath in ipairs(files) do
+        -- Kiểm tra đúng đuôi .lua
+        if filePath:lower():sub(-4) == ".lua" then
+            -- Tách tên file: Xử lý linh hoạt cho mọi loại đường dẫn (/) hoặc (\)
+            local fileName = filePath:match("([^\\/]+)%.lua$") or "Untitled"
+            
+            local readSuccess, content = pcall(readfile, filePath)
+            if readSuccess then
+                -- false ở tham số thứ 3 để không ghi đè lại chính nó khi đang load
+                addNewTab(fileName, content, true)
+            end
+        end
+    end
+    
+    logMessage("Loaded " .. #TabSystem.Tabs .. " scripts from workspace.", Colors.Success)
+end
+
+-- Khởi chạy load file (Bọc trong spawn để không chặn luồng UI chính)
+task.spawn(function()
+    loadWorkspaceFiles()
+    -- Sau khi load xong file, hiển thị nội dung tab đầu tiên
+    if TabSystem.Tabs[1] and inputSctipt then
+        inputSctipt.Text = TabSystem.Tabs[1].Content
     end
 end)
 
-logMessage("SM Engine v4.6 (-BETA-) Ready.", Colors.Text)
+logMessage("SM Engine v4.6 (-Preview-) Ready.", Colors.Text)
