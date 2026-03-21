@@ -21,47 +21,47 @@ local Tab = Window:CreateTab("Scripts", 4483362458)
 local scripts = {
     {
         Name = "Rc7RemoveLogIn.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/Rc7RemoveLogIn.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/Rc7RemoveLogIn.lua",
         Description = "Rc7 executor had removed login requirement."
     },
     {
         Name = "StatsController.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/StatsController.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/StatsController.lua",
         Description = "Controls player stats (speed, jump, health) in games without anti-cheat."
     },
     {
         Name = "sixthsenseformur.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/sixthsenseformur.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/sixthsenseformur.lua",
         Description = "Works in games about Sheriff and Murderer, shows who is sheriff, murderer, and innocent. May error in unknown or anti-cheat games."
     },
     {
         Name = "DaMurXFull.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/DaMurXFull.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/DaMurXFull.lua",
         Description = "Works only for The Dank Murderer X, shows all roles/jobs in it."
     },
     {
         Name = "God_Mode.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/God_Mode.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/God_Mode.lua",
         Description = "It is a beta version."
     },
     {
         Name = "NexusRemoteTunner.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/NexusRemoteTunner.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/NexusRemoteTunner.lua",
         Description = "Nexus helps you execute scripts on the selected remote event using the Advanced Executor."
     },
     {
         Name = "SM_EXECUTOR.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/SM_EXECUTOR.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/SM_EXECUTOR.lua",
         Description = "My first custom executor ,scanning backdoor feature is in Beta"
     },
     {
         Name = "SYSTEM_OPTIMIZER_PRO.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/SYSTEM_OPTIMIZER_PRO.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/SYSTEM_OPTIMIZER_PRO.lua",
         Description = "Unlock FPS and boost your experience"
     },
     {
         Name = "hitbox_extender.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/main/hitbox_extender.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/hitbox_extender.lua",
         Description = "Extend players' hitbox"
     }
 }
