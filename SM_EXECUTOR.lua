@@ -6,6 +6,7 @@ local _STORAGE = _G.OmniStorage or {}
 local ScreenGui = Instance.new("ScreenGui")
 _STORAGE["ScreenGui"] = ScreenGui
 ScreenGui.Name = "ScreenGui"
+ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game.CoreGui
 
 local BtnTgleGui = Instance.new("Frame")
