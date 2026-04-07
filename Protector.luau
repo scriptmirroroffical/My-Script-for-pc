@@ -1,211 +1,191 @@
--- [[ ULTIMATE PROTECTOR SYSTEM v3.0 - EXTREME EDITION ]] --
--- Features: Smooth Drag UI, Deep Scan, Anti-Tamper, Stack Tracing
+-- [[ PROTECTOR v4.0 BIG - THE JUGGERNAUT CORE ]] --
+-- Features: Advanced Sandbox, Deep Packet Inspection, Anti-Hook, Smooth UI v2
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 
-getgenv().ProtectorExtremeActive = true
+-- 1. UNIVERSAL COMPATIBILITY LAYER (ANTI-NIL)
+local hook = hookfunction or replaceclosure or detour_function or (syn and syn.hook_function)
+local h_metamethod = hookmetamethod or (setrawmetatable and function(t, m, f) 
+    local mt = getrawmetatable(t)
+    setreadonly(mt, false)
+    local old = mt[m]
+    mt[m] = f
+    return old
+end)
+local newc = newcclosure or function(f) return f end
 
-local function DefenderAlert(title, msg, isExtreme)
+getgenv().ProtectorActive = true
+local ThreatsFound = 0
+
+local function Notify(title, msg, extreme)
     StarterGui:SetCore("SendNotification", {
-        Title = isExtreme and "💀 " .. title or "🛡️ " .. title,
+        Title = extreme and "💀 " .. title or "🛡️ " .. title,
         Text = msg,
-        Duration = 6
+        Duration = 4
     })
 end
 
 -- ==========================================
--- 1. GIAO DIỆN VỚI SMOOTH DRAG TÍCH HỢP
+-- 2. ADVANCED VIRUS DETECTION ENGINE (v4)
 -- ==========================================
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ProtectorExtremeUI"
-ScreenGui.Parent = CoreGui
-
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 200, 0, 60)
-MainFrame.Position = UDim2.new(0.5, -100, 0, 20)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = MainFrame
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(1, 0, 0, 20)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "🛡️ Extreme Protector"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.TextSize = 12
-TitleLabel.Parent = MainFrame
-
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Size = UDim2.new(0.9, 0, 0, 30)
-ToggleBtn.Position = UDim2.new(0.05, 0, 0, 25)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-ToggleBtn.Text = "STATUS: SECURE"
-ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 0)
-ToggleBtn.Font = Enum.Font.GothamSemibold
-ToggleBtn.TextSize = 14
-ToggleBtn.Parent = MainFrame
-Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 6)
-
--- Hệ thống Smooth Drag
-local dragging, dragInput, dragStart, startPos
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        TweenService:Create(MainFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
-    end
-end)
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    getgenv().ProtectorExtremeActive = not getgenv().ProtectorExtremeActive
-    if getgenv().ProtectorExtremeActive then
-        ToggleBtn.Text = "STATUS: SECURE"
-        ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 0)
-        DefenderAlert("System", "Extreme Shield Reactivated!")
-    else
-        ToggleBtn.Text = "STATUS: EXPOSED"
-        ToggleBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
-        DefenderAlert("Warning", "Extreme Shield is OFF!", true)
-    end
-end)
-
--- ==========================================
--- 2. HỆ THỐNG DEEP SCAN & ANTI-TAMPER
--- ==========================================
-
-local BlacklistRegex = {
-    "roblosec", "cookie", "discord%.com/api/webhooks", "webhook",
-    "ipapi", "ident%.me", "token", "steal", "mailstealer", "ps99"
+local Blacklist = {
+    "cookie", ".roblosec", "webhook", "discord.com/api", "token", 
+    "ident.me", "ipapi", "steal", "grabber", "os.getenv", "getfenv"
 }
 
--- Thuật toán Deep Scan: Dò tìm mã độc ẩn (Obfuscated)
 local function DeepScan(content)
-    if not content then return false end
-    local lowerContent = string.lower(tostring(content))
+    if not content or type(content) ~= "string" then return false end
+    local low = string.lower(content)
     
-    -- Kiểm tra từ khóa rõ ràng
-    for _, pattern in ipairs(BlacklistRegex) do
-        if string.find(lowerContent, pattern) then
-            return true, "Blacklist Word: " .. pattern
-        end
+    -- Level 1: Keyword Check
+    for _, word in pairs(Blacklist) do
+        if string.find(low, word) then return true, "Blacklisted: " .. word end
     end
     
-    -- Kiểm tra hành vi mã hóa chuỗi (thường dùng để giấu webhook)
-    local hexCount = select(2, string.gsub(lowerContent, "%%x%%x", ""))
-    local escapeCount = select(2, string.gsub(lowerContent, "\\%d%d%d", ""))
+    -- Level 2: Obfuscation Pattern Analysis
+    local _, hex = string.gsub(low, "%%x%%x", "")
+    local _, esc = string.gsub(low, "\\%d%d%d", "")
+    if hex > 70 or esc > 70 then return true, "Extreme Obfuscation (Suspicious)" end
     
-    if hexCount > 50 or escapeCount > 50 then
-        return true, "Highly Obfuscated Payload (Suspicious)"
+    -- Level 3: Suspicious Bytecode (Mã độc ẩn trong chuỗi)
+    if string.find(low, "\104\116\116\112") and string.find(low, "webhook") then
+        return true, "Encrypted Webhook Detected"
     end
     
-    return false, "Safe"
+    return false
 end
 
--- Traceback: Truy tìm nguồn gốc script gọi hàm
-local function GetCallerInfo()
-    local trace = debug.traceback()
-    -- Cắt bỏ các phần của chính Protector để xem script nào đang gọi
-    local callerLine = string.split(trace, "\n")[3] or "Unknown Script"
-    return callerLine
-end
+-- ==========================================
+-- 3. INTERFACE: THE "BIG" UI (SMOOTH DRAG)
+-- ==========================================
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "Protector_v4_BIG"
 
--- Tự bảo vệ (Anti-Tamper): Ngăn script khác vô hiệu hóa Protector bằng cách hook đè
-local originalHookFunction = hookfunction
-originalHookFunction(hookfunction, function(target, replacement)
-    if getgenv().ProtectorExtremeActive then
-        -- Nếu một script cố gắng hook vào các hàm hệ thống mà Protector đang canh giữ
-        if target == game.HttpGet or target == loadstring then
-            warn("💀 [Protector Anti-Tamper]: Đã chặn hành vi Hook đè hệ thống!")
-            return function() end -- Trả về hàm rỗng
-        end
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 220, 0, 100)
+Main.Position = UDim2.new(0.5, -110, 0, 40)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Main.BorderSizePixel = 0
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+local Header = Instance.new("TextLabel", Main)
+Header.Size = UDim2.new(1, 0, 0, 30)
+Header.Text = "🛡️ PROTECTOR v4.0 BIG"
+Header.TextColor3 = Color3.fromRGB(255, 255, 255)
+Header.Font = Enum.Font.GothamBold
+Header.TextSize = 13
+Header.BackgroundTransparency = 1
+
+local Status = Instance.new("TextLabel", Main)
+Status.Size = UDim2.new(1, 0, 0, 20)
+Status.Position = UDim2.new(0, 0, 0.3, 0)
+Status.Text = "THREATS BLOCKED: 0"
+Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+Status.Font = Enum.Font.Code
+Status.TextSize = 11
+Status.BackgroundTransparency = 1
+
+local Toggle = Instance.new("TextButton", Main)
+Toggle.Size = UDim2.new(0.9, 0, 0, 30)
+Toggle.Position = UDim2.new(0.05, 0, 0.6, 0)
+Toggle.BackgroundColor3 = Color3.fromRGB(30, 200, 100)
+Toggle.Text = "SHIELD: ACTIVE"
+Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+Toggle.Font = Enum.Font.GothamBold
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
+
+-- Smooth Drag Logic
+local dragStart, startPos, dragging
+Main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true dragStart = input.Position startPos = Main.Position
     end
-    return originalHookFunction(target, replacement)
+end)
+UIS.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UIS.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+
+Toggle.MouseButton1Click:Connect(function()
+    getgenv().ProtectorActive = not getgenv().ProtectorActive
+    Toggle.Text = getgenv().ProtectorActive and "SHIELD: ACTIVE" or "SHIELD: OFF"
+    Toggle.BackgroundColor3 = getgenv().ProtectorActive and Color3.fromRGB(30, 200, 100) or Color3.fromRGB(200, 50, 50)
 end)
 
 -- ==========================================
--- 3. NETWORK & MEMORY HOOKS CỰC MẠNH
+-- 4. THE CORE: MULTI-OVERRIDE SHIELD
 -- ==========================================
 
--- Chặn HttpGet/HttpPost qua Namecall
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-    
-    if getgenv().ProtectorExtremeActive and (method == "HttpGet" or method == "HttpPost" or method == "HttpGetAsync") then
-        local url = args[1]
-        local isThreat, reason = DeepScan(url)
-        if isThreat then
-            DefenderAlert("Connection Terminated", "Ngăn chặn kết nối: " .. reason, true)
-            warn("❌ [Protector]: Chặn " .. tostring(url) .. " | Nguồn gọi: " .. GetCallerInfo())
-            return ""
-        end
-    end
-    return oldNamecall(self, ...)
-end)
+local function BlockAction(reason)
+    ThreatsFound = ThreatsFound + 1
+    Status.Text = "THREATS BLOCKED: " .. ThreatsFound
+    Notify("Threat Neutralized", reason, true)
+end
 
--- Chặn mọi loại HTTP Requests
-local requestFuncs = {request, http_request, syn and syn.request}
-for _, func in pairs(requestFuncs) do
-    if func then
-        local oldReq
-        oldReq = hookfunction(func, function(options)
-            if getgenv().ProtectorExtremeActive and type(options) == "table" then
-                local isThreatUrl, reasonUrl = DeepScan(options.Url)
-                local isThreatBody, reasonBody = DeepScan(options.Body)
-                
-                if isThreatUrl or isThreatBody then
-                    DefenderAlert("Webhook Blocked", "Đã tiêu diệt luồng dữ liệu đánh cắp!", true)
-                    warn("❌ [Protector HTTP]: Chặn Request tới " .. tostring(options.Url))
-                    return {StatusCode = 403, StatusMessage = "Forbidden", Body = "Blocked by Protector"}
-                end
+-- [A] Hook Metamethod (Chặn Game Call mượt mà)
+if h_metamethod then
+    local oldNM
+    oldNM = h_metamethod(game, "__namecall", newc(function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        if getgenv().ProtectorActive and (method == "HttpGet" or method == "HttpPost") then
+            if DeepScan(args[1]) then
+                BlockAction("Malicious URL Blocked")
+                return ""
             end
-            return oldReq(options)
-        end)
-    end
+        end
+        return oldNM(self, ...)
+    end))
 end
 
--- Chặn loadstring bằng Deep Scan
-if loadstring then
+-- [B] Hook Direct Functions (Chặn loadstring & request)
+if hook then
+    -- Loadstring Shield
     local oldLoad
-    oldLoad = hookfunction(loadstring, function(chunk, name)
-        if getgenv().ProtectorExtremeActive then
-            local isThreat, reason = DeepScan(chunk)
-            if isThreat then
-                DefenderAlert("Memory Shield", "Phát hiện mã độc trong bộ nhớ: " .. reason, true)
-                warn("❌ [Protector Loadstring]: Đã hủy một đoạn mã (" .. reason .. ")")
-                return function() warn("Payload Destroyed") end
-            end
+    oldLoad = hook(loadstring, newc(function(c, n)
+        if getgenv().ProtectorActive and DeepScan(c) then
+            BlockAction("Malicious Script Injection")
+            return function() end
         end
-        return oldLoad(chunk, name)
-    end)
+        return oldLoad(c, n)
+    end))
+
+    -- HTTP Request Shield (Executor Level)
+    local r_funcs = {request, http_request, syn and syn.request, fluxus and fluxus.request}
+    for _, f in pairs(r_funcs) do
+        if f then
+            local oldR
+            oldR = hook(f, newc(function(opt)
+                if getgenv().ProtectorActive and (DeepScan(opt.Url) or DeepScan(opt.Body)) then
+                    BlockAction("Data Stealer Prevented")
+                    return {StatusCode = 403, Body = "Blocked by Protector v4.0"}
+                end
+                return oldR(opt)
+            end))
+        end
+    end
+    
+    -- Clipboard Protection
+    if setclipboard then
+        local oldC
+        oldC = hook(setclipboard, newc(function(data)
+            if getgenv().ProtectorActive and DeepScan(data) then
+                BlockAction("Clipboard Theft Blocked")
+                return nil
+            end
+            return oldC(data)
+        end))
+    end
 end
 
-print("💀 [EXTREME PROTECTOR]: Khởi động hoàn tất. Môi trường đã bị khóa chặt.")
+print("=======================================")
+print("🛡️ PROTECTOR v4.0 BIG HAS BEEN ACTIVED 🛡️")
+print("Mode: Extreme Sandbox & Deep Scan")
+print("=======================================")
+Notify("System Ready", "Protector v4.0 BIG is protecting your environment.")
