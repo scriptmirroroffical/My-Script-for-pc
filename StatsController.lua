@@ -24,6 +24,7 @@ local bg = Instance.new("Frame")
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.BackgroundTransparency = 0.2
+bg.Draggable = true
 bg.Parent = loadGui
 
 local loadMain = Instance.new("Frame")
@@ -221,21 +222,6 @@ local function updateCache()
 end
 player.CharacterAdded:Connect(function() task.wait(0.5) updateCache() end)
 updateCache()
-
--- DRAG LOGIC (Smooth)
-local dragToggle, dragStart, startPos
-titleBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragToggle = true dragStart = input.Position startPos = mainFrame.Position
-	end
-end)
-UserInputService.InputChanged:Connect(function(input)
-	if dragToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
-end)
-UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragToggle = false end end)
 
 -- MAIN LOOP
 RunService.Heartbeat:Connect(function()
