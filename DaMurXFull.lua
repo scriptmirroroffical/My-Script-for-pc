@@ -9,52 +9,6 @@ screenGui.Name = "ESP_System_Optimized"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local function MakeDraggable(obj)
-    local dragging = false
-    local dragInput
-    local dragStart
-    local startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        -- Tối ưu hóa việc gán vị trí bằng cách sử dụng UDim2.fromOffset
-        obj.Position = UDim2.new(
-            startPos.X.Scale, 
-            startPos.X.Offset + delta.X, 
-            startPos.Y.Scale, 
-            startPos.Y.Offset + delta.Y
-        )
-    end
-
-    obj.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = obj.Position
-
-            -- Ngắt kết nối khi thả chuột/tay
-            local connection
-            connection = input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                    connection:Disconnect() -- Giải phóng bộ nhớ
-                end
-            end)
-        end
-    end)
-
-    obj.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
-    end)
-end
 ----------------------------------------------------------------
 -- LOADING SCREEN (UPDATED & OPTIMIZED)
 ----------------------------------------------------------------
@@ -93,7 +47,7 @@ Instance.new("UICorner", progressBg).CornerRadius = UDim.new(1, 0)
 
 local progressFill = Instance.new("Frame")
 progressFill.Size = UDim2.new(0, 0, 1, 0)
-progressFill.BackgroundColor3 = Color3.fromRGB(0, 255, 127) -- Màu xanh Neon
+progressFill.BackgroundColor3 = Color3.fromRGB(0, 255, 127)
 progressFill.BorderSizePixel = 0
 progressFill.Parent = progressBg
 Instance.new("UICorner", progressFill).CornerRadius = UDim.new(1, 0)
@@ -155,6 +109,7 @@ local Roles = {
     Taser      = {color = Color3.fromRGB(255, 165, 0), keywords = {"taser"}},
     Wizard     = {color = Color3.fromRGB(255, 182, 193), keywords = {"wizardorb"}},
     Clown      = {color = Color3.fromRGB(139, 69, 19), keywords = {"pie"}},
+    Chemist    = {color = Color3.fromRGB(140, 216, 260), keywords = {"potion"}},
     Innocent   = {color = Color3.fromRGB(0, 255, 0), keywords = {}}
 }
 
@@ -171,7 +126,7 @@ MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Visible = false
 MainFrame.Parent = screenGui
-MakeDraggable(MainFrame)
+MainFrame.Draggable = true
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local ESPButton = Instance.new("TextButton")
@@ -214,7 +169,7 @@ MiniFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MiniFrame.Visible = false
 MiniFrame.Active = true
 MiniFrame.Parent = screenGui
-MakeDraggable(MiniFrame)
+MiniFrame.Draggable = true
 Instance.new("UICorner", MiniFrame).CornerRadius = UDim.new(1, 0)
 
 local PlusButton = Instance.new("TextButton")
@@ -353,9 +308,10 @@ TPFrame.Size = UDim2.new(0, 160, 0, 250)
 TPFrame.Position = UDim2.new(0.5, -80, 0.3, 0)
 TPFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 TPFrame.Visible = false
+TPFrame.Draggable = true
 TPFrame.Parent = screenGui
 Instance.new("UICorner", TPFrame).CornerRadius = UDim.new(0, 8)
-MakeDraggable(TPFrame)
+
 
 local TPTitle = Instance.new("TextLabel")
 TPTitle.Size = UDim2.new(1, 0, 0.12, 0)
