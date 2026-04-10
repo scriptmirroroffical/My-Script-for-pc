@@ -9,6 +9,74 @@ screenGui.Name = "ESP_System_Optimized"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
+local function makeDraggable(guiObject)
+    -- Đảm bảo đây là UI
+    if not guiObject:IsA("GuiObject") then
+        warn("makeDraggable chỉ hoạt động với GuiObject!")
+        return
+    end
+
+    local isDragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+
+    local connections = {}
+
+    -- Hàm xử lý logic di chuyển
+    local function update(input)
+        local delta = input.Position - dragStart
+        
+        -- Cập nhật trực tiếp vào Offset để đảm bảo tốc độ phản hồi nhanh nhất (Anti-lag)
+        guiObject.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    -- 1. Khi người dùng bấm/chạm vào UI
+    table.insert(connections, guiObject.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            dragStart = input.Position
+            startPos = guiObject.Position
+
+            -- Ngắt trạng thái kéo nếu thả tay/chuột ra (kể cả khi thả ngoài màn hình)
+            local releaseConn
+            releaseConn = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    isDragging = false
+                    releaseConn:Disconnect()
+                end
+            end)
+        end
+    end))
+
+    -- 2. Ghi nhận loại input đang được sử dụng để di chuyển
+    table.insert(connections, guiObject.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end))
+
+    -- 3. Cập nhật vị trí thông qua UserInputService (Chống lag & chống tuột chuột)
+    table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and isDragging then
+            update(input)
+        end
+    end))
+
+    -- Trả về một hàm dọn dẹp để gọi khi bạn muốn xóa tính năng kéo thả hoặc hủy UI
+    return function()
+        for _, conn in ipairs(connections) do
+            conn:Disconnect()
+        end
+        table.clear(connections)
+    end
+end
+
 ----------------------------------------------------------------
 -- LOADING SCREEN (UPDATED & OPTIMIZED)
 ----------------------------------------------------------------
@@ -126,7 +194,7 @@ MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Visible = false
 MainFrame.Parent = screenGui
-MainFrame.Draggable = true
+makeDraggable(MainFrame)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local ESPButton = Instance.new("TextButton")
@@ -169,7 +237,7 @@ MiniFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MiniFrame.Visible = false
 MiniFrame.Active = true
 MiniFrame.Parent = screenGui
-MiniFrame.Draggable = true
+makeDraggable(MiniFrame)
 Instance.new("UICorner", MiniFrame).CornerRadius = UDim.new(1, 0)
 
 local PlusButton = Instance.new("TextButton")
@@ -308,7 +376,7 @@ TPFrame.Size = UDim2.new(0, 160, 0, 250)
 TPFrame.Position = UDim2.new(0.5, -80, 0.3, 0)
 TPFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 TPFrame.Visible = false
-TPFrame.Draggable = true
+makeDraggable(TPFrame)
 TPFrame.Parent = screenGui
 Instance.new("UICorner", TPFrame).CornerRadius = UDim.new(0, 8)
 
