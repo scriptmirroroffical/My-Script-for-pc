@@ -7,6 +7,74 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+local function makeDraggable(guiObject)
+    -- Đảm bảo đây là UI
+    if not guiObject:IsA("GuiObject") then
+        warn("makeDraggable chỉ hoạt động với GuiObject!")
+        return
+    end
+
+    local isDragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+
+    local connections = {}
+
+    -- Hàm xử lý logic di chuyển
+    local function update(input)
+        local delta = input.Position - dragStart
+        
+        -- Cập nhật trực tiếp vào Offset để đảm bảo tốc độ phản hồi nhanh nhất (Anti-lag)
+        guiObject.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    -- 1. Khi người dùng bấm/chạm vào UI
+    table.insert(connections, guiObject.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDragging = true
+            dragStart = input.Position
+            startPos = guiObject.Position
+
+            -- Ngắt trạng thái kéo nếu thả tay/chuột ra (kể cả khi thả ngoài màn hình)
+            local releaseConn
+            releaseConn = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    isDragging = false
+                    releaseConn:Disconnect()
+                end
+            end)
+        end
+    end))
+
+    -- 2. Ghi nhận loại input đang được sử dụng để di chuyển
+    table.insert(connections, guiObject.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end))
+
+    -- 3. Cập nhật vị trí thông qua UserInputService (Chống lag & chống tuột chuột)
+    table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and isDragging then
+            update(input)
+        end
+    end))
+
+    -- Trả về một hàm dọn dẹp để gọi khi bạn muốn xóa tính năng kéo thả hoặc hủy UI
+    return function()
+        for _, conn in ipairs(connections) do
+            conn:Disconnect()
+        end
+        table.clear(connections)
+    end
+end
+
 -- 1. XÓA CÁC BẢN CŨ ĐỂ TRÁNH TRÀN GUI
 for _, oldGui in ipairs(playerGui:GetChildren()) do
 	if oldGui.Name == "StatsController_V7" or oldGui:FindFirstChild("MainFrame") then
@@ -24,7 +92,7 @@ local bg = Instance.new("Frame")
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.BackgroundTransparency = 0.2
-bg.Draggable = true
+makeDraggable(bg)
 bg.Parent = loadGui
 
 local loadMain = Instance.new("Frame")
