@@ -14,53 +14,73 @@ else
 	screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 end
 
-local function MakeDraggable(obj)
-    local dragging = false
-    local dragInput
-    local dragStart
-    local startPos
+local function MakeDraggable(guiObject)
+    -- Đảm bảo đây là UI
+    if not guiObject:IsA("GuiObject") then
+        warn("makeDraggable chỉ hoạt động với GuiObject!")
+        return
+    end
 
+    local isDragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+
+    local connections = {}
+
+    -- Hàm xử lý logic di chuyển
     local function update(input)
         local delta = input.Position - dragStart
-        -- Tối ưu hóa việc gán vị trí bằng cách sử dụng UDim2.fromOffset
-        obj.Position = UDim2.new(
-            startPos.X.Scale, 
-            startPos.X.Offset + delta.X, 
-            startPos.Y.Scale, 
+        
+        -- Cập nhật trực tiếp vào Offset để đảm bảo tốc độ phản hồi nhanh nhất (Anti-lag)
+        guiObject.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
             startPos.Y.Offset + delta.Y
         )
     end
 
-    obj.InputBegan:Connect(function(input)
+    -- 1. Khi người dùng bấm/chạm vào UI
+    table.insert(connections, guiObject.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
+            isDragging = true
             dragStart = input.Position
-            startPos = obj.Position
+            startPos = guiObject.Position
 
-            -- Ngắt kết nối khi thả chuột/tay
-            local connection
-            connection = input.Changed:Connect(function()
+            -- Ngắt trạng thái kéo nếu thả tay/chuột ra (kể cả khi thả ngoài màn hình)
+            local releaseConn
+            releaseConn = input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                    connection:Disconnect() -- Giải phóng bộ nhớ
+                    isDragging = false
+                    releaseConn:Disconnect()
                 end
             end)
         end
-    end)
+    end))
 
-    obj.InputChanged:Connect(function(input)
+    -- 2. Ghi nhận loại input đang được sử dụng để di chuyển
+    table.insert(connections, guiObject.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
-    end)
+    end))
 
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+    -- 3. Cập nhật vị trí thông qua UserInputService (Chống lag & chống tuột chuột)
+    table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and isDragging then
             update(input)
         end
-    end)
-end
+    end))
 
+    -- Trả về một hàm dọn dẹp để gọi khi bạn muốn xóa tính năng kéo thả hoặc hủy UI
+    return function()
+        for _, conn in ipairs(connections) do
+            conn:Disconnect()
+        end
+        table.clear(connections)
+    end
+end
 ----------------------------------------------------------------
 -- GIAO DIỆN CHÍNH (MainFrame)
 ----------------------------------------------------------------
