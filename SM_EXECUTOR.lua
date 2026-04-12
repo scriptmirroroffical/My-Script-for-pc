@@ -955,21 +955,49 @@ TextBox:GetPropertyChangedSignal("Text"):Connect(update)
 -- Chạy lần đầu
 update()
 
---=========================================
--- HỆ THỐNG CON TRỎ TÙY CHỈNH (BYPASS ROBLOX)
---=========================================
+local TextService = game:GetService("TextService")
 
-local TextBox = TextBox
+local EngineState = {
+    Cooldowns = { Execute = false }
+}
+
+local Colors = {
+    Success = Color3.fromRGB(0, 255, 127),
+    Error = Color3.fromRGB(255, 85, 85),
+    Warning = Color3.fromRGB(255, 170, 0),
+    Idle = Color3.fromRGB(170, 170, 170)
+}
+
+-- Hàm Log thông báo
+local function safeLog(msg, color)
+    print("[OMNI-GOD]: " .. msg)
+    -- Bạn có thể thêm code hiển thị thông báo lên màn hình tại đây
+end
+
+local TextService = game:GetService("TextService")
+
+-- 1. Cấu hình đường dẫn (Hãy chắc chắn tên TextBox và ExecuteBtn đúng trong Explorer)
+local ExecuteBtn = ExecBtn
+
+local EngineState = { Cooldowns = { Execute = false } }
+
+--=========================================
+-- 2. HỆ THỐNG CON TRỎ GIẢ (FIXED POSITION)
+--=========================================
 local FakeCursor = Instance.new("Frame")
-
--- 1. Thiết lập ngoại hình con trỏ
 FakeCursor.Name = "CustomCursor"
-FakeCursor.Size = UDim2.new(0, 2, 0, 25.45) -- Độ dày 2px, cao 20px (tùy chỉnh theo cỡ chữ)
-FakeCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Màu trắng neon
+-- Chỉnh Size cao thấp tùy theo TextSize của bạn (thường là bằng hoặc hơn TextSize 2-4 đơn vị)
+FakeCursor.Size = UDim2.new(0, 2, 0, TextBox.TextSize) 
+FakeCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 FakeCursor.BorderSizePixel = 0
+FakeCursor.ZIndex = 10
 FakeCursor.Visible = false
-FakeCursor.Parent = TextBox.Parent 
+FakeCursor.Parent = TextBox.Parent
+
 local CurCor = Instance.new("UICorner", FakeCursor)
+CurCor.CornerRadius = UDim.new(0, 8)
+
+-- Luồng nhấp nháy
 task.spawn(function()
     while true do
         if FakeCursor.Visible then
@@ -983,22 +1011,39 @@ task.spawn(function()
     end
 end)
 
+-- HÀM CẬP NHẬT VỊ TRÍ (ĐÃ FIX LỖI "BAY")
 local function updateCursor()
     if TextBox:IsFocused() then
-        local textBeforeCursor = TextBox.Text
+        local cp = TextBox.CursorPosition
+        if cp == -1 then cp = #TextBox.Text + 1 end
+        
+        local textUpToCursor = string.sub(TextBox.Text, 1, cp - 1)
         local fontSize = TextBox.TextSize
         local font = TextBox.Font
         
-        local textService = game:GetService("TextService")
-        local size = textService:GetTextSize(textBeforeCursor, fontSize, font, Vector2.new(10000, 10000))
+        -- Tính toán kích thước đoạn text đã nhập
+        -- Vector2.new(TextBox.AbsoluteSize.X, 10000) giúp hỗ trợ cả khi bạn xuống dòng
+        local size = TextService:GetTextSize(textUpToCursor, fontSize, font, Vector2.new(TextBox.AbsoluteSize.X, 10000))
         
-        FakeCursor.Position = UDim2.new(0, TextBox.Position.X.Offset + size.X + 2, 0, TextBox.Position.Y.Offset)
+        -- TÍNH TOÁN TỌA ĐỘ MỚI:
+        -- X: Lấy theo độ dài chữ + Offset của TextBox
+        -- Y: Lấy theo chiều cao dòng (size.Y) để không bị bay xuống giữa ô
+        local xOffset = size.X + 2
+        local yOffset = size.Y - fontSize -- Đẩy lên đầu dòng thay vì giữa ô
+        
+        FakeCursor.Position = UDim2.new(
+            TextBox.Position.X.Scale, 
+            TextBox.Position.X.Offset + xOffset, 
+            TextBox.Position.Y.Scale, 
+            TextBox.Position.Y.Offset + yOffset + 2 -- +2 để căn lề trên cho đẹp
+        )
         FakeCursor.Visible = true
     else
         FakeCursor.Visible = false
     end
 end
 
+TextBox:GetPropertyChangedSignal("CursorPosition"):Connect(updateCursor)
 TextBox:GetPropertyChangedSignal("Text"):Connect(updateCursor)
 TextBox.Focused:Connect(updateCursor)
 TextBox.FocusLost:Connect(function() FakeCursor.Visible = false end)
