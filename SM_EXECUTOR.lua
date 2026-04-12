@@ -355,6 +355,7 @@ TextLabel126132.ClipsDescendants = false
 TextLabel126132.Parent = Home
 
 TextLabel126132.MouseButton1Click:Connect(function()
+    TextLabel126132:Destroy()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/Framework/ForceShutdown.Engine.SM"))()
     task.wait(2)    
     ScreenGui:Destroy()
