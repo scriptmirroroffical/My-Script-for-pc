@@ -265,20 +265,10 @@ _STORAGE["UICorner_10"] = UICorner_10
 UICorner_10.Name = "UICorner"
 UICorner_10.Parent = _STORAGE["ExecBtn_2"] or ExecBtn_2
 
-local UICorner_11 = Instance.new("UICorner")
-_STORAGE["UICorner_11"] = UICorner_11
-UICorner_11.Name = "UICorner"
-UICorner_11.Parent = _STORAGE["RTSL"] or RTSL
-
-local UICorner_12 = Instance.new("UICorner")
-_STORAGE["UICorner_12"] = UICorner_12
-UICorner_12.Name = "UICorner"
-UICorner_12.Parent = _STORAGE["RTSL_2"] or RTSL_2
-
 local ScrollingFrame = Instance.new("ScrollingFrame")
 ScrollingFrame.Name = "ScrollingFrame"
-ScrollingFrame.Size = UDim2.new(0, 879.510413, 0, 275)
-ScrollingFrame.Position = UDim2.new(0.0172413792, 0, 0.0275178906, 0)
+ScrollingFrame.Size = UDim2.new(0.965, 0, 0.75, 0)
+ScrollingFrame.Position = UDim2.new(0.017, 0, 0.027, 0)
 ScrollingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ScrollingFrame.BorderSizePixel = 0
 ScrollingFrame.ScrollBarThickness = 5
@@ -291,7 +281,7 @@ UICorne1111r.Name = "UICorner"
 UICorne1111r.Parent = _STORAGE["ScrollingFrame"] or ScrollingFrame
 
 local TextBox = Instance.new("TextBox")
-TextBox.Size = UDim2.new(1, 0, 1, 0) 
+TextBox.Size = UDim2.new(1, 0, 0, 0)
 TextBox.BackgroundTransparency = 1 
 TextBox.TextTransparency = 1 
 TextBox.ZIndex = 2 
@@ -344,8 +334,8 @@ UICorner_14.Parent = _STORAGE["Home"] or Home
 local TextLabel126132 = Instance.new("TextButton")
 _STORAGE["TextLabel126132"] = TextLabel126132
 TextLabel126132.Name = "TextLabel126132"
-TextLabel126132.Size = UDim2.new(0, 184, 0, 36)
-TextLabel126132.Position = UDim2.new(0.75870353, 0, 0.0421316363, 0)
+TextLabel126132.Size = UDim2.new(0.25, 0, 0.08, 0)
+TextLabel126132.Position = UDim2.new(0.7, 0, 0.053, 0)
 TextLabel126132.Text = "Force Shutdown UI"
 TextLabel126132.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 TextLabel126132.BackgroundTransparency = 0
@@ -593,14 +583,8 @@ local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
 
--- Lấy UI từ Storage của Smart Relay
 local _STORAGE = _G.OmniStorage
-if not _STORAGE then
-	warn("[SM CORE v7.5]: FATAL ERROR - KHÔNG TÌM THẤY UI! Vui lòng chạy script UI trước.")
-	return
-end
 
--- Map các UI Elements an toàn bằng table lookup
 local UI = {
 	ScreenGui = _STORAGE["ScreenGui"],
 	BtnTgleGui = _STORAGE["BtnTgleGui"],
@@ -634,9 +618,7 @@ local EngineState = {
 	UI_Visible = true,
 	CurrentTab = "Home",
 	DiscoveredRemotes = {},
-	-- Hệ thống khóa để tránh spam click
 	Cooldowns = {
-		Scan = false,
 		Execute = false
 	}
 }
@@ -655,11 +637,6 @@ local Colors = {
 	Info = Color3.fromRGB(97, 255, 255),
 	SS = Color3.fromRGB(170, 85, 255),
 	Idle = Color3.fromRGB(255, 230, 102)
-}
-
-local ExtremeKeys = {
-	"Run", "Execute", "Load", "SS", "Admin", "F1113", "C00lkidd", "Pex", "Kohl",
-	"Request", "ServerSide", "Console", "Main", "Control", "Fire", "Update", "Sync"
 }
 
 --=========================================
@@ -942,19 +919,14 @@ update()
 --=========================================
 -- 6. BỘ XỬ LÝ THỰC THI (EXECUTION HANDLER)
 --=========================================
-
--- Hàm hỗ trợ tìm kiếm method thực thi từ nhiều môi trường (Bypass / Fallback)
 local function getCompilerMethod()
-    -- Ưu tiên các hàm mạnh nhất từ global environment
     if type(getgenv) == "function" then
         local env = getgenv()
         if type(env.loadstring) == "function" then return env.loadstring end
         if type(env.load) == "function" then return env.load end
-        -- Có thể mở rộng thêm các method đặc thù của từng platform tại đây
         if type(env.run_secure) == "function" then return env.run_secure end 
     end
-    
-    -- Fallback về môi trường local
+
     if type(loadstring) == "function" then return loadstring end
     if type(load) == "function" then return load end
     
@@ -971,24 +943,18 @@ UI.ExecuteBtn.MouseButton1Click:Connect(function()
         EngineState.Cooldowns.Execute = false
         return 
     end
-        
-    safeLog("Đang phân tích & chạy luồng Local...", Colors.Idle, 2)
     
     local compilerFunc = getCompilerMethod()
     
     if compilerFunc then
-        -- Sử dụng pcall ở khâu compile để bắt lỗi Syntax một cách an toàn
         local successCompile, compiledFuncOrErr = pcall(compilerFunc, inputSource)
         
         if successCompile and type(compiledFuncOrErr) == "function" then
             
-            -- Ép script chạy với quyền hạn global cao nhất (nếu có thể)
             if setfenv and getgenv then
                 pcall(setfenv, compiledFuncOrErr, getgenv())
             end
 
-            -- Chạy script trong một luồng riêng (Anti-Yield Bypass)
-            -- Đảm bảo UI mượt mà, không bị treo nếu script có vòng lặp vô hạn hoặc task.wait()
             task.spawn(function()
                 local s, rErr = pcall(compiledFuncOrErr)
                 if not s then 
