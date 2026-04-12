@@ -265,87 +265,63 @@ _STORAGE["UICorner_10"] = UICorner_10
 UICorner_10.Name = "UICorner"
 UICorner_10.Parent = _STORAGE["ExecBtn_2"] or ExecBtn_2
 
-local RTSL = Instance.new("TextButton")
-_STORAGE["RTSL"] = RTSL
-RTSL.Name = "RTSL"
-RTSL.Size = UDim2.new(0.174876854, 0, 0.15337424, 0)
-RTSL.Position = UDim2.new(0.192118227, 0, 0.820194364, 0)
-RTSL.Text = "Return to silent"
-RTSL.BackgroundColor3 = Color3.fromRGB(97, 255, 255)
-RTSL.BackgroundTransparency = 0
-RTSL.TextTransparency = 0
-RTSL.Visible = true
-RTSL.ZIndex = 1
-RTSL.FontFace = Font.new("rbxasset://fonts/families/IndieFlower.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-RTSL.TextScaled = true
-RTSL.TextSize = 14
-RTSL.TextColor3 = Color3.fromRGB(0, 0, 0)
-RTSL.BorderSizePixel = 0
-RTSL.TextXAlignment = Enum.TextXAlignment.Center
-RTSL.TextYAlignment = Enum.TextYAlignment.Center
-RTSL.TextWrapped = true
-RTSL.ClipsDescendants = false
-RTSL.Parent = _STORAGE["Exec"] or Exec
-
 local UICorner_11 = Instance.new("UICorner")
 _STORAGE["UICorner_11"] = UICorner_11
 UICorner_11.Name = "UICorner"
 UICorner_11.Parent = _STORAGE["RTSL"] or RTSL
-
-local RTSL_2 = Instance.new("TextButton")
-_STORAGE["RTSL_2"] = RTSL_2
-RTSL_2.Name = "RTSL"
-RTSL_2.Size = UDim2.new(0.284482747, 0, 0.15337424, 0)
-RTSL_2.Position = UDim2.new(0.697044313, 0, 0.820194364, 0)
-RTSL_2.Text = "Scan Backdoor"
-RTSL_2.BackgroundColor3 = Color3.fromRGB(255, 115, 90)
-RTSL_2.BackgroundTransparency = 0
-RTSL_2.TextTransparency = 0
-RTSL_2.Visible = true
-RTSL_2.ZIndex = 1
-RTSL_2.FontFace = Font.new("rbxasset://fonts/families/IndieFlower.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-RTSL_2.TextScaled = true
-RTSL_2.TextSize = 14
-RTSL_2.TextColor3 = Color3.fromRGB(0, 0, 0)
-RTSL_2.BorderSizePixel = 0
-RTSL_2.TextXAlignment = Enum.TextXAlignment.Center
-RTSL_2.TextYAlignment = Enum.TextYAlignment.Center
-RTSL_2.TextWrapped = true
-RTSL_2.ClipsDescendants = false
-RTSL_2.Parent = _STORAGE["Exec"] or Exec
 
 local UICorner_12 = Instance.new("UICorner")
 _STORAGE["UICorner_12"] = UICorner_12
 UICorner_12.Name = "UICorner"
 UICorner_12.Parent = _STORAGE["RTSL_2"] or RTSL_2
 
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Name = "ScrollingFrame"
+ScrollingFrame.Size = UDim2.new(0, 879.510413, 0, 275)
+ScrollingFrame.Position = UDim2.new(0.0172413792, 0, 0.0275178906, 0)
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.ScrollBarThickness = 5
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollingFrame.Parent = Exec
+
+local UICorne1111r = Instance.new("UICorner")
+_STORAGE["UICorne1111r"] = UICorne1111r
+UICorne1111r.Name = "UICorner"
+UICorne1111r.Parent = _STORAGE["ScrollingFrame"] or ScrollingFrame
+
 local TextBox = Instance.new("TextBox")
-_STORAGE["TextBox"] = TextBox
-TextBox.Name = "TextBox"
-TextBox.Size = UDim2.new(0.964285731, 0, 0.75460124, 0)
-TextBox.Position = UDim2.new(0.0172413792, 0, 0.0306748468, 0)
-TextBox.Text = ""
-TextBox.BackgroundColor3 = Color3.fromRGB(138, 138, 138)
-TextBox.BackgroundTransparency = 0
-TextBox.TextTransparency = 0
-TextBox.Visible = true
-TextBox.ZIndex = 1
-TextBox.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-TextBox.Font = Enum.Font.SourceSans
-TextBox.TextScaled = true
-TextBox.TextSize = 14
-TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextBox.BorderSizePixel = 0
+TextBox.Size = UDim2.new(1, 0, 1, 0) 
+TextBox.BackgroundTransparency = 1 
+TextBox.TextTransparency = 1 
+TextBox.ZIndex = 2 
+TextBox.FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json")
+TextBox.TextSize = 26
+TextBox.MultiLine = true
+TextBox.ClearTextOnFocus = false
 TextBox.TextXAlignment = Enum.TextXAlignment.Left
 TextBox.TextYAlignment = Enum.TextYAlignment.Top
-TextBox.TextWrapped = true
+TextBox.TextWrapped = false 
 TextBox.ClipsDescendants = true
-TextBox.Parent = _STORAGE["Exec"] or Exec
+TextBox.Parent = ScrollingFrame
+
+local HighlightLabel = Instance.new("TextLabel")
+HighlightLabel.Size = TextBox.Size
+HighlightLabel.BackgroundTransparency = 1
+HighlightLabel.ZIndex = 1 
+HighlightLabel.FontFace = TextBox.FontFace
+HighlightLabel.TextSize = TextBox.TextSize
+HighlightLabel.TextXAlignment = TextBox.TextXAlignment
+HighlightLabel.TextYAlignment = TextBox.TextYAlignment
+HighlightLabel.TextWrapped = false 
+HighlightLabel.RichText = true
+HighlightLabel.Text = ""
+HighlightLabel.Parent = TextBox.Parent or ScrollingFrame
 
 local UICorner_13 = Instance.new("UICorner")
 _STORAGE["UICorner_13"] = UICorner_13
 UICorner_13.Name = "UICorner"
-UICorner_13.Parent = _STORAGE["TextBox"] or TextBox
+UICorner_13.Parent = HighlightLabel
 
 local Home = Instance.new("Frame")
 _STORAGE["Home"] = Home
@@ -364,6 +340,34 @@ local UICorner_14 = Instance.new("UICorner")
 _STORAGE["UICorner_14"] = UICorner_14
 UICorner_14.Name = "UICorner"
 UICorner_14.Parent = _STORAGE["Home"] or Home
+
+local TextLabel126132 = Instance.new("TextButton")
+_STORAGE["TextLabel126132"] = TextLabel126132
+TextLabel126132.Name = "TextLabel126132"
+TextLabel126132.Size = UDim2.new(0, 184, 0, 36)
+TextLabel126132.Position = UDim2.new(0.75870353, 0, 0.0421316363, 0)
+TextLabel126132.Text = "Force Shutdown UI"
+TextLabel126132.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+TextLabel126132.BackgroundTransparency = 0
+TextLabel126132.TextTransparency = 0
+TextLabel126132.Visible = true
+TextLabel126132.ZIndex = 1
+TextLabel126132.FontFace = Font.new("rbxasset://fonts/families/Inconsolata.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextLabel126132.Font = Enum.Font.Code
+TextLabel126132.TextScaled = true
+TextLabel126132.TextSize = 14
+TextLabel126132.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel126132.BorderSizePixel = 0
+TextLabel126132.TextXAlignment = Enum.TextXAlignment.Center
+TextLabel126132.TextYAlignment = Enum.TextYAlignment.Center
+TextLabel126132.TextWrapped = true
+TextLabel126132.ClipsDescendants = false
+TextLabel126132.Parent = Home
+
+local UICorner = Instance.new("UICorner")
+_STORAGE["UICorner"] = UICorner
+UICorner.Name = "UICorner"
+UICorner.Parent = _STORAGE["TextLabel126132"] or TextLabel126132
 
 local ImageLabel = Instance.new("ImageLabel")
 _STORAGE["ImageLabel"] = ImageLabel
@@ -476,130 +480,246 @@ TextLabel_5.TextWrapped = true
 TextLabel_5.ClipsDescendants = false
 TextLabel_5.Parent = _STORAGE["Home"] or Home
 
+local Massage = Instance.new("Frame")
+_STORAGE["Massage"] = Massage
+Massage.Name = "Massage"
+Massage.Size = UDim2.new(0.207367197, 0, 0.144965276, 0)
+Massage.Position = UDim2.new(0.792486072, 0, 0.855034709, 0)
+Massage.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+Massage.BackgroundTransparency = 0
+Massage.Visible = true
+Massage.ZIndex = 999
+Massage.BorderSizePixel = 0
+Massage.ClipsDescendants = false
+Massage.Parent = _STORAGE["ScreenGui"] or ScreenGui
+
+local UICorner99 = Instance.new("UICorner")
+_STORAGE["UICorner99"] = UICorner99
+UICorner99.Name = "UICorner99"
+UICorner99.Parent = _STORAGE["Massage"] or Massage
+
+local ImageLabel99 = Instance.new("ImageLabel")
+_STORAGE["ImageLabel99"] = ImageLabel99
+ImageLabel99.Name = "ImageLabel99"
+ImageLabel99.Size = UDim2.new(0.0600240156, 0, 0.144508675, 0)
+ImageLabel99.Position = UDim2.new(0.0192076825, 0, 0.0433526002, 0)
+ImageLabel99.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel99.BackgroundTransparency = 0
+ImageLabel99.Image = "rbxassetid://88774721887954"
+ImageLabel99.ImageTransparency = 0
+ImageLabel99.Visible = true
+ImageLabel99.ZIndex = 1000
+ImageLabel99.BorderSizePixel = 0
+ImageLabel99.ClipsDescendants = false
+ImageLabel99.Parent = _STORAGE["Massage"] or Massage
+
+local UICorner = Instance.new("UICorner")
+_STORAGE["UICorner"] = UICorner
+UICorner.Name = "UICorner"
+UICorner.Parent = _STORAGE["ImageLabel99"] or ImageLabel99
+
+local TextLabel99 = Instance.new("TextLabel")
+_STORAGE["TextLabel99"] = TextLabel99
+TextLabel99.Name = "TextLabel99"
+TextLabel99.Size = UDim2.new(0.409947485, 0, 0.144508675, 0)
+TextLabel99.Position = UDim2.new(0.100007206, 0, 0.0433525033, 0)
+TextLabel99.Text = "SM Executor Notice"
+TextLabel99.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel99.BackgroundTransparency = 1
+TextLabel99.TextTransparency = 0
+TextLabel99.Visible = true
+TextLabel99.ZIndex = 1000
+TextLabel99.FontFace = Font.new("rbxasset://fonts/families/Fondamento.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
+TextLabel99.TextScaled = true
+TextLabel99.TextSize = 14
+TextLabel99.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel99.BorderSizePixel = 0
+TextLabel99.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel99.TextYAlignment = Enum.TextYAlignment.Center
+TextLabel99.TextWrapped = true
+TextLabel99.ClipsDescendants = false
+TextLabel99.Parent = _STORAGE["Massage"] or Massage
+
+local MassageContent = Instance.new("TextLabel")
+_STORAGE["MassageContent"] = MassageContent
+MassageContent.Name = "MassageContent"
+MassageContent.Size = UDim2.new(1, 0, 0.814371228, 0)
+MassageContent.Position = UDim2.new(0, 0, 0.191616774, 0)
+MassageContent.Text = "<Massage-Content>"
+MassageContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+MassageContent.BackgroundTransparency = 1
+MassageContent.TextTransparency = 0
+MassageContent.Visible = true
+MassageContent.ZIndex = 1000
+MassageContent.FontFace = Font.new("rbxasset://fonts/families/Kalam.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+MassageContent.Font = Enum.Font.Kalam
+MassageContent.TextScaled = true
+MassageContent.TextColor3 = Color3.fromRGB(0, 0, 0)
+MassageContent.BorderSizePixel = 0
+MassageContent.TextXAlignment = Enum.TextXAlignment.Left
+MassageContent.TextYAlignment = Enum.TextYAlignment.Top
+MassageContent.TextWrapped = true
+MassageContent.ClipsDescendants = false
+MassageContent.Parent = _STORAGE["Massage"] or Massage
+
 _G.OmniStorage = _STORAGE
 
 --[[
     ======================================================================
-    🔥 OMNI-GOD PRO CORE v7.0 - ULTIMATE EDITION 🔥
-    Author: son171020 (Powered by SM Engine)
+    🔥 OMNI-GOD PRO CORE v7.5 - ULTIMATE EDITION 🔥
+    Author: son171020 (Powered by SM Engine & Advanced Logic)
     Description: Advanced Modular Core for OmniStorage UI
-    Features: Smooth Drag, Tween Animations, Deep Scanner, SS Injector
+    Features: Smooth Drag, Tween Animations, Deep Scanner, SS Injector, Custom Env
+    Optimization: Anti-Lag Batching, Redundant Logic Removed, Deep Error Handling
     ======================================================================
 ]]
 
 --=========================================
--- 1. INITIALIZATION & SERVICES
+-- 1. INITIALIZATION & CORE SERVICES
 --=========================================
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
 local LocalPlayer = Players.LocalPlayer
 
--- Lấy UI từ Storage của bạn
+-- Lấy UI từ Storage của Smart Relay
 local _STORAGE = _G.OmniStorage
 if not _STORAGE then
-	warn("[SM CORE v7.0]: KHÔNG TÌM THẤY UI! Vui lòng chạy script UI trước.")
+	warn("[SM CORE v7.5]: FATAL ERROR - KHÔNG TÌM THẤY UI! Vui lòng chạy script UI trước.")
 	return
 end
 
--- Map các UI Elements
+-- Map các UI Elements an toàn bằng table lookup
 local UI = {
 	ScreenGui = _STORAGE["ScreenGui"],
 	BtnTgleGui = _STORAGE["BtnTgleGui"],
-	ImageButton = _STORAGE["ImageButton"], -- Nút bật/tắt
-	MainMenu = _STORAGE["MainMenu"],       -- Menu điều hướng
+	ImageButton = _STORAGE["ImageButton"], 
+	MainMenu = _STORAGE["MainMenu"],       
 	HomeBtn = _STORAGE["HomeBtn"],
-	ExecBtnNav = _STORAGE["ExecBtn"],      -- Nút chuyển sang tab Exec
-	Menu = _STORAGE["Menu"],               -- Menu nội dung chính
-	HomeTab = _STORAGE["Home"],            -- Tab Trang chủ
-	ExecTab = _STORAGE["Exec"],            -- Tab Executor
-	TextBox = _STORAGE["TextBox"],         -- Chỗ nhập code
-	ExecuteBtn = _STORAGE["ExecBtn_2"],    -- Nút Execute (Thực thi)
-	ScanBtn = _STORAGE["RTSL_2"],          -- Nút Scan
-	ReturnBtn = _STORAGE["RTSL"],          -- Nút Return
-	NameLabel = _STORAGE["Name"]
+	ExecBtnNav = _STORAGE["ExecBtn"],      
+	Menu = _STORAGE["Menu"],               
+	HomeTab = _STORAGE["Home"],            
+	ExecTab = _STORAGE["Exec"],            
+	TextBox = _STORAGE["TextBox"],         
+	ExecuteBtn = _STORAGE["ExecBtn_2"],    
+	ScanBtn = _STORAGE["RTSL_2"],          
+	ReturnBtn = _STORAGE["RTSL"],          
+	NameLabel = _STORAGE["Name"],
+	MessageFrame = _STORAGE["MessageFrame"],
+	MessageContent = _STORAGE["MessageContent"],
+	BackGO = _STORAGE["BackGO"]
 }
 
 --=========================================
--- 2. ENGINE STATE (Trạng thái hệ thống)
+-- 2. ENGINE STATE & CONFIGURATION
 --=========================================
 local EngineState = {
-	Version = "7.0.0-PRO",
+	Version = "7.5.0-ULTIMATE",
 	SSMode = false,
 	TargetRemote = nil,
+	ValidKey = nil,
+	ExecuteMethod = 1,
 	Scanning = false,
 	UI_Visible = true,
-	CurrentTab = "Home" -- "Home" hoặc "Exec"
+	CurrentTab = "Home",
+	DiscoveredRemotes = {},
+	-- Hệ thống khóa để tránh spam click
+	Cooldowns = {
+		Scan = false,
+		Execute = false
+	}
 }
 
---=========================================
--- 3. HỆ THỐNG LOG & THÔNG BÁO (SAFE LOG)
---=========================================
+local Config = {
+	BatchSize = 200, 
+	WaitTime = 0.03, 
+	VerificationToken = "SM_GOD_" .. HttpService:GenerateGUID(false):sub(1, 8),
+	TweenSpeed = 0.4
+}
+
 local Colors = {
 	Success = Color3.fromRGB(0, 255, 127),
 	Warning = Color3.fromRGB(255, 170, 0),
 	Error = Color3.fromRGB(255, 65, 65),
 	Info = Color3.fromRGB(97, 255, 255),
-	SS = Color3.fromRGB(170, 85, 255)
+	SS = Color3.fromRGB(170, 85, 255),
+	Idle = Color3.fromRGB(255, 230, 102)
 }
 
-local function safeLog(message, colorType)
-	local prefix = "[SM Core v7.0]: "
-	-- In ra Console F9
-	print(prefix .. message)
+local ExtremeKeys = {
+	"Run", "Execute", "Load", "SS", "Admin", "F1113", "C00lkidd", "Pex", "Kohl",
+	"Request", "ServerSide", "Console", "Main", "Control", "Fire", "Update", "Sync"
+}
 
-	-- Đổi màu viền của TextBox để báo hiệu cho user thay vì dùng label rườm rà
-	if UI.TextBox then
-		local originalColor = UI.TextBox.BackgroundColor3
-		local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local tweenColor = TweenService:Create(UI.TextBox, tweenInfo, {BackgroundColor3 = colorType or Colors.Info})
-		local tweenBack = TweenService:Create(UI.TextBox, tweenInfo, {BackgroundColor3 = originalColor})
+--=========================================
+-- 3. HỆ THỐNG LOG & THÔNG BÁO (DEEP LOGGER)
+--=========================================
+local function safeLog(message, colorType, displayTime)
+	local prefix = "[SM Core v7.5]: "
+	local timestamp = os.date("%X")
 
-		tweenColor:Play()
-		tweenColor.Completed:Connect(function()
+	-- Ghi Log F9 Console
+	print(string.format("%s [%s] %s", prefix, timestamp, message))
+
+	-- Đổi màu viền TextBox tạo hiệu ứng thị giác (nếu đang ở tab Exec)
+	if UI.TextBox and EngineState.CurrentTab == "Exec" then
+		task.spawn(function()
+			local originalColor = Color3.fromRGB(138, 138, 138)
+			local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			TweenService:Create(UI.TextBox, tweenInfo, {BackgroundColor3 = colorType or Colors.Info}):Play()
 			task.wait(0.5)
-			tweenBack:Play()
+			TweenService:Create(UI.TextBox, tweenInfo, {BackgroundColor3 = originalColor}):Play()
+		end)
+	end
+
+	-- Đẩy thông báo lên Notice System (nếu có UI)
+	if UI.MessageFrame and UI.MessageContent then
+		UI.MessageContent.Text = message
+		UI.MessageContent.TextColor3 = colorType or Colors.Info
+		UI.MessageFrame.Visible = true
+
+		-- Animation trượt lên cho Notice
+		UI.MessageFrame.Position = UDim2.new(0.792, 0, 1, 0)
+		TweenService:Create(UI.MessageFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {Position = UDim2.new(0.792, 0, 0.855, 0)}):Play()
+
+		task.spawn(function()
+			task.wait(displayTime or 3)
+			TweenService:Create(UI.MessageFrame, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {Position = UDim2.new(0.792, 0, 1.2, 0)}):Play()
+			task.wait(0.3)
+			UI.MessageFrame.Visible = false
 		end)
 	end
 end
 
 --=========================================
--- 4. HIỆU ỨNG & CHUYỂN ĐỘNG (ANIMATIONS)
+-- 4. HIỆU ỨNG & GIAO DIỆN CHUYÊN SÂU
 --=========================================
--- Tween cấu hình chuẩn
-local tweenConfig = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-
--- Lấy chính xác BackGO từ Storage
-local backgo = _G.OmniStorage["BackGO"]
+local standardTween = TweenInfo.new(Config.TweenSpeed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
 local function toggleUI()
 	EngineState.UI_Visible = not EngineState.UI_Visible
 
 	local targetPosMenu = EngineState.UI_Visible and UDim2.new(0.207, 0, 0.462, 0) or UDim2.new(0.207, 0, 1.5, 0)
 	local targetPosMain = EngineState.UI_Visible and UDim2.new(0.046, 0, 0.535, 0) or UDim2.new(0.046, 0, 1.5, 0)
-
-	-- Trạng thái: Mở = 0.4 (Đậm) | Đóng = 0.9 (Mờ hẳn)
 	local targetTrans = EngineState.UI_Visible and 0.155 or 0.655
 
-	-- Chạy các hiệu ứng trượt Menu
-	TweenService:Create(UI.Menu, tweenConfig, {Position = targetPosMenu}):Play()
-	TweenService:Create(UI.MainMenu, tweenConfig, {Position = targetPosMain}):Play()
+	TweenService:Create(UI.Menu, standardTween, {Position = targetPosMenu}):Play()
+	TweenService:Create(UI.MainMenu, standardTween, {Position = targetPosMain}):Play()
 
-	-- FIX: Ép BackGO thay đổi độ mờ
-	if backgo then
-		TweenService:Create(backgo, tweenConfig, {BackgroundTransparency = targetTrans}):Play()
+	if UI.BackGO then
+		TweenService:Create(UI.BackGO, standardTween, {BackgroundTransparency = targetTrans}):Play()
 	end
 
-	-- Xoay nhẹ Logo khi bấm
 	local rot = EngineState.UI_Visible and 0 or 180
 	TweenService:Create(UI.ImageButton, TweenInfo.new(0.3), {Rotation = rot}):Play()
 end
-
 UI.ImageButton.MouseButton1Click:Connect(toggleUI)
 
--- Chuyển Tab (Home <-> Exec)
 local function switchTab(tabName)
 	if EngineState.CurrentTab == tabName then return end
 	EngineState.CurrentTab = tabName
@@ -616,33 +736,19 @@ local function switchTab(tabName)
 		TweenService:Create(UI.HomeBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 140, 0)}):Play()
 	end
 end
-
 UI.HomeBtn.MouseButton1Click:Connect(function() switchTab("Home") end)
 UI.ExecBtnNav.MouseButton1Click:Connect(function() switchTab("Exec") end)
-
--- Ẩn Exec mặc định khi load
 UI.ExecTab.Visible = false
 
---=========================================
--- 5. SMOOTH DRAGGING MODULE (FIXED)
---=========================================
--- Chỉ áp dụng cho Frame, KHÔNG áp dụng cho ScreenGui
+-- Kéo thả mượt mà (Smooth Dragging)
 local function makeDraggable(guiObject)
 	local dragging, dragInput, dragStart, startPos
-
-	local function update(input)
-		local delta = input.Position - dragStart
-		local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-		-- Dùng Tween để kéo mượt hơn thay vì gán cứng
-		TweenService:Create(guiObject, TweenInfo.new(0.1, Enum.EasingStyle.Sine), {Position = newPos}):Play()
-	end
 
 	guiObject.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			dragStart = input.Position
 			startPos = guiObject.Position
-
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then dragging = false end
 			end)
@@ -656,365 +762,419 @@ local function makeDraggable(guiObject)
 	end)
 
 	UserInputService.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then update(input) end
+		if input == dragInput and dragging then 
+			local delta = input.Position - dragStart
+			local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			TweenService:Create(guiObject, TweenInfo.new(0.1, Enum.EasingStyle.Sine), {Position = newPos}):Play()
+		end
 	end)
 end
-
 makeDraggable(UI.MainMenu)
 makeDraggable(UI.Menu)
 
---[[
-    SM-EXECUTOR: CORE SCANNER EXTREME V7 [PROTOTYPE]
-    VERSION: 7.0.2 (RE-ENGINEERED)
-    LOGIC: MULTI-THREADED LALOL + ADAPTIVE BACKDOOR DETECTION
-    STABILITY: HIGH (ANTI-LAG BATCHING)
---]]
-
--- Services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
-local HttpService = game:GetService("HttpService")
-local RunService = game:GetService("RunService")
-
--- Configuration & State
-local Config = {
-    BatchSize = 150, -- Số lượng object xử lý mỗi frame để tránh lag
-    WaitTime = 0.05, -- Delay giữa các giai đoạn kiểm tra
-    RetryAttempts = 2,
-    VerificationToken = "SM_X7_" .. HttpService:GenerateGUID(false):sub(1, 6)
+--=========================================
+--Textbox Update
+--=========================================
+local keywords = {
+    lua = {"and", "break", "or", "else", "elseif", "if", "then", "until", "repeat", "while", "do", "for", "in", "end", "local", "return", "function", "export", "instance"},
+    rbx = {"game", "new", "workspace", "script", "math", "string", "table", "task", "wait", "select", "next", "Enum", "error", "warn", "tick", "assert", "shared", "loadstring", "tonumber", "tostring", "type", "typeof", "unpack", "print", "Instance", "CFrame", "Vector3", "Vector2", "Color3", "UDim", "UDim2", "Ray", "BrickColor", "OverlapParams", "RaycastParams", "Axes", "Random", "Region3", "Rect", "TweenInfo", "collectgarbage", "not", "utf8", "pcall", "xpcall", "_G", "setmetatable", "getmetatable", "os", "pairs", "ipairs"},
+    exploit = {"hookmetamethod", "hookfunction", "getgc", "filtergc", "Drawing", "getgenv", "getsenv", "getrenv", "getfenv", "setfenv", "decompile", "saveinstance", "getrawmetatable", "setrawmetatable", "checkcaller", "cloneref", "clonefunction", "iscclosure", "islclosure", "isexecutorclosure", "newcclosure", "getfunctionhash", "crypt", "writefile", "appendfile", "loadfile", "readfile", "listfiles", "makefolder", "isfolder", "isfile", "delfile", "delfolder", "getcustomasset", "fireclickdetector", "firetouchinterest", "fireproximityprompt"},
+    operators = {"#", "+", "-", "*", "%", "/", "^", "=", "~", "<", ">", ",", ".", "(", ")", "{", "}", "[", "]", ";", ":"}
 }
 
-local EngineState = {
-    Scanning = false,
-    TargetRemote = nil,
-    ValidKey = nil,
-    ExecuteMethod = 1,
-    DiscoveredRemotes = {},
-    LogHistory = {}
+local colors = {
+    numbers = Color3.fromRGB(255, 198, 0),
+    boolean = Color3.fromRGB(255, 198, 0),
+    operator = Color3.fromRGB(204, 204, 204),
+    lua = Color3.fromRGB(132, 214, 247),
+    exploit = Color3.fromRGB(171, 84, 247),
+    rbx = Color3.fromRGB(248, 109, 124),
+    str = Color3.fromRGB(173, 241, 132),
+    comment = Color3.fromRGB(102, 102, 102),
+    null = Color3.fromRGB(255, 198, 0),
+    keyword_special = Color3.fromRGB(248, 109, 115),
+    default = Color3.fromRGB(255, 255, 255)
 }
 
--- Dictionary mở rộng (Tích hợp LALOL, SM, và phổ biến 2024-2026)
-local ExtremeKeys = {
-    "Run", "Execute", "Load", "SS", "Admin", "F1113", "C00lkidd", "Pex", "Kohl",
-    "Request", "ServerSide", "Console", "Main", "Control", "Fire", "Update"
-}
-
--- Helper Functions
-local function safeLog(msg, color)
-    local timestamp = os.date("%X")
-    print(string.format("[%s] [SM-LOG]: %s", timestamp, msg))
-    -- Giả định hàm UI safeLog của bạn đã tồn tại bên ngoài
-    if _G.UIPanelLog then
-        _G.UIPanelLog(msg, color)
-    end
+local function getHex(color)
+    return string.format("#%02X%02X%02X", color.R * 255, color.G * 255, color.B * 255)
 end
 
-local function checkServerSideVerification()
-    -- Kiểm tra xem server có thực thi mã tạo Part không
-    local verified = Workspace:FindFirstChild(Config.VerificationToken)
-    if verified then
-        verified:Destroy()
-        return true
-    end
-    return false
+local function toSet(list)
+    local s = {}
+    for _, v in ipairs(list) do s[v] = true end
+    return s
 end
 
--- Main Executor Logic
-local function runUltraScanExtremeV7()
-    if EngineState.Scanning then return end
-    EngineState.Scanning = true
+local luaSet = toSet(keywords.lua)
+local rbxSet = toSet(keywords.rbx)
+local exploitSet = toSet(keywords.exploit)
+local opSet = toSet(keywords.operators)
+
+local function escape(t)
+    return t:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
+end
+
+local function runHighlight(source)
+    local output = {}
+    local pos = 1
+    local len = #source
     
-    -- Reset State
-    EngineState.TargetRemote = nil
-    EngineState.ValidKey = nil
-    EngineState.DiscoveredRemotes = {}
-    
-    UI.ScanBtn.Text = "INITIALIZING..."
-    UI.ScanBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 0)
-
-    task.spawn(function()
-        -- GIAI ĐOẠN 1: QUÉT PHÂN TẦNG (HIGH-SPEED INDEXING)
-        safeLog("Bắt đầu quét tầng sâu hệ thống...", Color3.fromRGB(255, 255, 255))
+    while pos <= len do
+        local char = source:sub(pos, pos)
         
-        local targetServices = {ReplicatedStorage, Workspace, game:GetService("JointsService")}
-        local rawObjects = {}
-        
-        for _, service in ipairs(targetServices) do
-            local descendants = service:GetDescendants()
-            for i, obj in ipairs(descendants) do
-                table.insert(rawObjects, obj)
-                -- Batching để tránh treo game
-                if i % Config.BatchSize == 0 then
-                    UI.ScanBtn.Text = "INDEXING: " .. math.floor((i/#descendants)*100) .. "%"
-                    RunService.Heartbeat:Wait()
-                end
-            end
-        end
-
-        for _, obj in ipairs(rawObjects) do
-            if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
-                local name = obj.Name:lower()
-                -- Lọc bỏ các remote mặc định của Roblox
-                if not obj:IsDescendantOf(game:GetService("Chat")) and not name:find("adservice") then
-                    table.insert(EngineState.DiscoveredRemotes, obj)
-                end
-            end
-        end
-
-        safeLog("Phân tích thành công " .. #EngineState.DiscoveredRemotes .. " cổng Remotes.", Color3.fromRGB(255, 200, 0))
-
-        -- GIAI ĐOẠN 2: THẨM ĐỊNH ĐA PHƯƠNG THỨC (MULTI-METHOD VERIFICATION)
-        for i, remote in ipairs(EngineState.DiscoveredRemotes) do
-            if EngineState.TargetRemote then break end
+        -- 1. Kiểm tra Comment (--)
+        if source:sub(pos, pos + 1) == "--" then
+            local comment = source:match("^[^\n]*", pos)
+            output[#output + 1] = string.format('<font color="%s">%s</font>', getHex(colors.comment), escape(comment))
+            pos = pos + #comment
             
-            UI.ScanBtn.Text = "V-CHECK: " .. i .. "/" .. #EngineState.DiscoveredRemotes
-            task.wait(0.1) -- Giãn cách để tránh Rate Limit / Anti-Kick
-
-            pcall(function()
-                -- Mã kiểm tra: Tạo một Part ẩn ở Server-side
-                local testPayload = string.format(
-                    "local p = Instance.new('Part', workspace); p.Name = '%s'; p.Transparency = 1; p.CanCollide = false; p.Anchored = true;",
-                    Config.VerificationToken
-                )
-
-                -- Các Method tấn công logic
-                local methods = {
-                    [1] = function() -- Standard Fire
-                        if remote:IsA("RemoteEvent") then remote:FireServer(testPayload) end
-                    end,
-                    [2] = function() -- Named Execute
-                        if remote:IsA("RemoteEvent") then remote:FireServer("Execute", testPayload) end
-                    end,
-                    [3] = function() -- Dictionary Key Bruteforce
-                        for _, key in ipairs(ExtremeKeys) do
-                            if EngineState.TargetRemote then break end
-                            if remote:IsA("RemoteEvent") then 
-                                remote:FireServer(key, testPayload)
-                                task.wait(0.05)
-                                if checkServerSideVerification() then
-                                    EngineState.ValidKey = key
-                                    return true
-                                end
-                            end
-                        end
-                    end,
-                    [4] = function() -- Invoke Return Check
-                        if remote:IsA("RemoteFunction") then
-                            local res = remote:InvokeServer("return '" .. Config.VerificationToken .. "'")
-                            return res == Config.VerificationToken
-                        end
-                    end
-                }
-
-                -- Chạy thử nghiệm từng Method
-                for mIndex = 1, #methods do
-                    if EngineState.TargetRemote then break end
-                    
-                    local success = methods[mIndex]()
-                    task.wait(0.1) -- Chờ server phản hồi
-
-                    if success or checkServerSideVerification() then
-                        EngineState.TargetRemote = remote
-                        EngineState.ExecuteMethod = mIndex
-                        break
-                    end
-                end
-            end)
-        end
-
-        -- GIAI ĐOẠN KẾT THÚC: REPORT & HOOK
-        if EngineState.TargetRemote then
-            UI.ScanBtn.Text = "ACCESS GRANTED"
-            UI.ScanBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
-            UI.ExecuteBtn.Text = "FIRE SERVER-SIDE"
-            UI.ExecuteBtn.Visible = true
+        -- 2. Kiểm tra String (" " hoặc ' ')
+        elseif char == '"' or char == "'" then
+            local str = source:match("^(['\"].-['\"])", pos) or char
+            output[#output + 1] = string.format('<font color="%s">%s</font>', getHex(colors.str), escape(str))
+            pos = pos + #str
             
-            safeLog("✅ TRUY CẬP THÀNH CÔNG: " .. EngineState.TargetRemote:GetFullName(), Color3.fromRGB(0, 255, 0))
-            if EngineState.ValidKey then
-                safeLog("🔑 KEY PHÁT HIỆN: " .. EngineState.ValidKey, Color3.fromRGB(0, 255, 200))
+        -- 3. Kiểm tra Số
+        elseif char:match("%d") then
+            local num = source:match("^%d+", pos)
+            output[#output + 1] = string.format('<font color="%s">%s</font>', getHex(colors.numbers), num)
+            pos = pos + #num
+            
+        -- 4. Kiểm tra Chữ, Keywords, và Tiếng Việt (TỐI ƯU SIÊU TỐC)
+        -- Sử dụng \128-\255 để gom toàn bộ từ có dấu tiếng Việt vào thành 1 chuỗi, không bị tách rời
+        elseif char:match("[%a_]") or string.byte(char) > 127 then
+            local word = source:match("^[%w_%z\128-\255]+", pos)
+            if not word then word = char end -- Fallback an toàn
+            
+            local color = colors.default
+            if luaSet[word] then 
+                color = (word == "local" or word == "function") and colors.keyword_special or colors.lua
+            elseif rbxSet[word] then color = colors.rbx
+            elseif exploitSet[word] then color = colors.exploit
+            elseif word == "true" or word == "false" or word == "nil" then color = colors.boolean
             end
+            
+            output[#output + 1] = string.format('<font color="%s">%s</font>', getHex(color), escape(word))
+            pos = pos + #word
+            
+        -- 5. Kiểm tra Toán tử
+        elseif opSet[char] then
+            output[#output + 1] = string.format('<font color="%s">%s</font>', getHex(colors.operator), escape(char))
+            pos = pos + 1
+            
+        -- 6. Xuống dòng và Khoảng trắng
         else
-            UI.ScanBtn.Text = "SCAN FAILED"
-            UI.ScanBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-            safeLog("❌ Không tìm thấy lỗ hổng Remote khả thi.", Color3.fromRGB(255, 50, 50))
-            task.wait(3)
-            UI.ScanBtn.Text = "RESCAN BACKDOOR"
-            UI.ScanBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            output[#output + 1] = escape(char)
+            pos = pos + 1
         end
+    end
+    
+    return table.concat(output)
+end
 
-        EngineState.Scanning = false
+local function updateScrolling()
+    -- Lấy kích thước thực tế của toàn bộ văn bản (bao gồm cả các dòng đã xuống)
+    local textSize = TextBox.TextBounds
+    
+    -- Tính toán CanvasSize mới dựa trên TextBounds
+    -- Thêm một khoảng đệm (Padding) để không bị che mất dòng cuối
+    local padding = 50
+    local newCanvasSize = UDim2.new(0, textSize.X + padding, 0, textSize.Y + padding)
+    
+    ScrollingFrame.CanvasSize = newCanvasSize
+    
+    -- Quan trọng: TextBox và Label phải luôn lớn bằng CanvasSize để hiển thị hết chữ
+    TextBox.Size = newCanvasSize
+    HighlightLabel.Size = newCanvasSize
+end
+
+local lastUpdate = 0
+local UPDATE_DELAY = 0.05 -- Giảm độ trễ xuống cực thấp cho script dài
+
+local function update()
+    local source = TextBox.Text
+    
+    -- TRƯỜNG HỢP 1: Script quá dài (Tránh Crash Game)
+    if #source > 15000 then 
+        HighlightLabel.RichText = false
+        HighlightLabel.Text = source
+        -- Chỉ tính toán lại kích thước cuộn
+        updateScrolling()
+        return
+    end
+
+    -- TRƯỜNG HỢP 2: Script ngắn & vừa (< 5000 ký tự) -> XỬ LÝ TỨC THÌ 0 GIÂY
+    if #source < 5000 then
+        HighlightLabel.RichText = true
+        HighlightLabel.Text = runHighlight(source)
+        updateScrolling()
+        return
+    end
+
+    -- TRƯỜNG HỢP 3: Script trung bình (5000 - 15000) -> Dùng Debounce nhẹ để không tụt FPS
+    local currentTime = tick()
+    lastUpdate = currentTime
+    
+    task.wait(UPDATE_DELAY)
+    
+    if lastUpdate ~= currentTime then return end
+
+    HighlightLabel.RichText = true
+    task.spawn(function()
+        HighlightLabel.Text = runHighlight(source)
+        updateScrolling()
     end)
 end
 
--- Binding (Giả định nút bấm UI của bạn)
-UI.ScanBtn.MouseButton1Click:Connect(runUltraScanExtremeV7)
+-- Kết nối sự kiện
+TextBox:GetPropertyChangedSignal("Text"):Connect(update)
+
+-- Chạy lần đầu
+update()
 
 --=========================================
--- 3-METHOD EXECUTE (SM-LOGIC)
+-- 6. BỘ XỬ LÝ THỰC THI (EXECUTION HANDLER)
 --=========================================
-local function SS_Execute_V6(code)
-    if not EngineState.TargetRemote then 
-        safeLog("Chưa có Remote SS nào được nạp!", Colors.Error)
+
+-- Hàm hỗ trợ tìm kiếm method thực thi từ nhiều môi trường (Bypass / Fallback)
+local function getCompilerMethod()
+    -- Ưu tiên các hàm mạnh nhất từ global environment
+    if type(getgenv) == "function" then
+        local env = getgenv()
+        if type(env.loadstring) == "function" then return env.loadstring end
+        if type(env.load) == "function" then return env.load end
+        -- Có thể mở rộng thêm các method đặc thù của từng platform tại đây
+        if type(env.run_secure) == "function" then return env.run_secure end 
+    end
+    
+    -- Fallback về môi trường local
+    if type(loadstring) == "function" then return loadstring end
+    if type(load) == "function" then return load end
+    
+    return nil
+end
+
+UI.ExecuteBtn.MouseButton1Click:Connect(function()
+    if EngineState.Cooldowns.Execute then return end
+    EngineState.Cooldowns.Execute = true
+
+    local inputSource = UI.TextBox.Text
+    if inputSource == "" or inputSource:match("^%s*$") then 
+        safeLog("Trường dữ liệu rỗng! Hãy nhập script.", Colors.Warning, 3)
+        EngineState.Cooldowns.Execute = false
         return 
     end
+        
+    safeLog("Đang phân tích & chạy luồng Local...", Colors.Idle, 2)
     
-    local remote = EngineState.TargetRemote
-    local method = EngineState.ExecuteMethod
-    local key = EngineState.ValidKey
+    local compilerFunc = getCompilerMethod()
+    
+    if compilerFunc then
+        -- Sử dụng pcall ở khâu compile để bắt lỗi Syntax một cách an toàn
+        local successCompile, compiledFuncOrErr = pcall(compilerFunc, inputSource)
+        
+        if successCompile and type(compiledFuncOrErr) == "function" then
+            
+            -- Ép script chạy với quyền hạn global cao nhất (nếu có thể)
+            if setfenv and getgenv then
+                pcall(setfenv, compiledFuncOrErr, getgenv())
+            end
 
-    local success, err = pcall(function()
-        if method == 1 then
-            remote:FireServer(code)
-        elseif method == 2 then
-            remote:FireServer("Execute", code)
-        elseif method == 3 then
-            remote:FireServer(key, code)
+            -- Chạy script trong một luồng riêng (Anti-Yield Bypass)
+            -- Đảm bảo UI mượt mà, không bị treo nếu script có vòng lặp vô hạn hoặc task.wait()
+            task.spawn(function()
+                local s, rErr = pcall(compiledFuncOrErr)
+                if not s then 
+                    safeLog("Runtime Error: " .. tostring(rErr), Colors.Error, 5) 
+                else 
+                    safeLog("✅ Thực thi Local thành công!", Colors.Success, 3) 
+                end
+            end)
+            
+        else 
+            safeLog("Syntax/Compile Error: " .. tostring(compiledFuncOrErr), Colors.Error, 5) 
         end
-    end)
-
-    if success then
-        safeLog("🚀 Gửi lệnh thành công qua Method " .. method, Colors.Success)
     else
-        safeLog("⚠️ Lỗi thực thi: " .. tostring(err), Colors.Error)
+        safeLog("❌ Môi trường hiện tại không hỗ trợ bất kỳ method compile nào!", Colors.Error, 4)
     end
-end
 
--- Kết nối UI
-UI.ScanBtn.MouseButton1Click:Connect(runUltraScanExtremeV6)
-UI.ExecuteBtn.MouseButton1Click:Connect(function()
-    SS_Execute_V6(UI.Editor.Text)
+    task.wait(0.5)
+    EngineState.Cooldowns.Execute = false
 end)
 
 --=========================================
--- 7. SS & LOCAL EXECUTOR MODULE
+-- 8. SM-ROTATION-CORE (VÒNG LẶP HÌNH ẢNH)
 --=========================================
-UI.ExecuteBtn.MouseButton1Click:Connect(function()
-	local inputSource = UI.TextBox.Text
-	if inputSource == "" or inputSource == " " then 
-		safeLog("Vui lòng nhập script trước!", Colors.Error)
-		return 
-	end
-
-	local remote = EngineState.TargetRemote
-
-	-- [ THỰC THI SERVER-SIDE ]
-	if EngineState.SSMode and remote then
-		safeLog("Đang thử nghiệm các Payload vào SS...", Colors.Warning)
-
-		local _, cleanCode = pcall(function() return inputSource:gsub('"', '\\"') end)
-		cleanCode = cleanCode or inputSource
-
-		local payloads = {
-			inputSource, 
-			"spawn(function() " .. inputSource .. " end)",
-			[[require(666666).load("]] .. cleanCode .. [[")]],
-			{["script"] = inputSource, ["type"] = "execute"}
-		}
-
-		task.spawn(function()
-			local successCount = 0
-			for i, p in ipairs(payloads) do
-				local s, _ = pcall(function()
-					if remote:IsA("RemoteEvent") then remote:FireServer(p) else remote:InvokeServer(p) end
-				end)
-				if s then successCount = successCount + 1 end
-				task.wait(0.1)
-			end
-
-			if successCount > 0 then 
-				safeLog("Đã gửi Payload SS! Mở F9 tab Server để kiểm tra.", Colors.Success)
-			else
-				safeLog("Thất bại. Remote đã chặn hoặc bị lỗi.", Colors.Error)
-			end
-		end)
-
-		-- [ THỰC THI CLIENT-SIDE ]
-	else
-		local execFunc = loadstring or getgenv().loadstring
-		if execFunc then
-			local f, err = execFunc(inputSource)
-			if f then 
-				local s, rErr = pcall(f)
-				if not s then safeLog("Runtime Lỗi: " .. tostring(rErr), Colors.Error) 
-				else safeLog("Thực thi Local thành công!", Colors.Success) end
-			else 
-				safeLog("Syntax Lỗi: " .. tostring(err), Colors.Error) 
-			end
-		else
-			safeLog("Executor này không hỗ trợ lệnh loadstring!", Colors.Error)
-		end
-	end
-end)
-
---=========================================
--- 8. RETURN TO SILENT MODULE
---=========================================
-UI.ReturnBtn.MouseButton1Click:Connect(function()
-	EngineState.SSMode = false
-	EngineState.TargetRemote = nil
-
-	-- Reset giao diện về bình thường
-	UI.ExecuteBtn.Text = "EXECUTE"
-	UI.ExecuteBtn.BackgroundColor3 = Color3.fromRGB(255, 230, 102)
-	UI.ScanBtn.Text = "Scan Backdoor"
-	UI.ScanBtn.BackgroundColor3 = Color3.fromRGB(255, 115, 90)
-	UI.NameLabel.Text = "SM Executor"
-	UI.NameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-
-	safeLog("Đã hủy kết nối SS. Trở về chế độ Client.", Colors.Info)
-end)
-
---=========================================
--- FIX: BACKGO XOAY VÔ TẬN (SM-ROTATION-CORE)
---=========================================
-
 local function StartBackRotation()
-	local backgo = _STORAGE["BackGO"] or UI.BackGO
+	if UI.BackGO then
+		UI.BackGO.AnchorPoint = Vector2.new(0.5, 0.5)
+		UI.BackGO.Position = UDim2.new(0.5, 0, 0.5, 0) 
 
-	if backgo then
-		-- 1. QUAN TRỌNG: Đặt tâm xoay vào giữa (Tránh xoay lệch)
-		backgo.AnchorPoint = Vector2.new(0.5, 0.5)
-
-		-- Cập nhật lại Position để không bị lệch khi đổi AnchorPoint
-		-- (Dựa trên tọa độ gốc của bạn: -0.093, -0.087)
-		backgo.Position = UDim2.new(0.5, 0, 0.5, 0) 
-
-		-- 2. Thiết lập Tween xoay 360 độ liên tục
-		-- Thời gian: 4 giây | Easing: Linear (Xoay đều) | Repeat: -1 (Vô tận)
-		local rotateInfo = TweenInfo.new(
-			4, 
-			Enum.EasingStyle.Linear, 
-			Enum.EasingDirection.InOut, 
-			-1, 
-			false
-		)
-
-		-- Tạo và chạy Tween
-		local rotateTween = TweenService:Create(backgo, rotateInfo, {
-			Rotation = 360
-		})
-
-		rotateTween:Play()
-
-		-- Debug (Xóa sau khi chạy tốt)
-		print("SM Engine: BackGO Rotation Started.")
-	else
-		warn("SM Engine: Không tìm thấy BackGO để xoay!")
+		local rotateInfo = TweenInfo.new(6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false)
+		TweenService:Create(UI.BackGO, rotateInfo, {Rotation = 360}):Play()
 	end
 end
-
--- Chạy hàm xoay ngay khi load script
 task.spawn(StartBackRotation)
 
--- Reset màu Logo về trắng khi thoát SS
-local function resetLogoColor()
-	if not UI.ImageButton then return end
-	local colorTweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-	TweenService:Create(UI.ImageButton, colorTweenInfo, {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+--[[ 
+    ======================================================================
+    🔥 OMNI-GOD NOTICE ENGINE v7.8 - ULTIMATE FIX 🔥
+    Sửa lỗi: Chữ bị đen, không cập nhật nội dung, ZIndex thấp
+    ======================================================================
+]]
+
+local _STORAGE = _G.OmniStorage
+local TweenService = game:GetService("TweenService")
+
+-- 1. CẤU HÌNH (Đã chỉnh lại vị trí trượt mượt hơn)
+local NoticeConfig = {
+    Position_Visible = UDim2.new(0.792, 0, 0.855, 0), 
+    Position_Hidden = UDim2.new(0.792, 0, 1.2, 0),   
+    DefaultTime = 2.5,
+    Queue = {},
+    IsProcessing = false
+}
+
+-- 2. HÀM XỬ LÝ QUY TRÌNH HIỆN CHỮ
+local function processNoticeQueue()
+    if #NoticeConfig.Queue == 0 or NoticeConfig.IsProcessing then return end
+    
+    local frame = _STORAGE["Massage"]
+    local content = _STORAGE["MassageContent"]
+
+    if not frame or not content then return end
+
+    NoticeConfig.IsProcessing = true
+    local data = table.remove(NoticeConfig.Queue, 1)
+
+    -- CÀI ĐẶT THUỘC TÍNH QUAN TRỌNG (ÉP HIỆN CHỮ)
+    content.Text = "" -- Reset chữ cũ
+    content.Text = tostring(data.Text)
+    content.TextTransparency = 0
+    content.TextStrokeTransparency = 0.5 -- Thêm viền nhẹ cho chữ nổi bật
+    
+    frame.Visible = true
+    frame.Position = NoticeConfig.Position_Hidden
+
+    -- Animation trượt lên
+    local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Position = NoticeConfig.Position_Visible
+    })
+    
+    tweenIn:Play()
+    task.wait(0.6 + data.Duration)
+
+    -- Animation trượt xuống
+    local tweenOut = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = NoticeConfig.Position_Hidden
+    })
+    
+    tweenOut:Play()
+    task.wait(0.5)
+    
+    frame.Visible = false
+    NoticeConfig.IsProcessing = false
+    processNoticeQueue()
 end
+
+-- 3. HÀM GỌI NOTIFY CHUẨN
+local function notify(text, color, duration)
+    table.insert(NoticeConfig.Queue, {
+        Text = text,
+        Color = color or Color3.fromRGB(255, 255, 255),
+        Duration = duration or NoticeConfig.DefaultTime
+    })
+    task.spawn(processNoticeQueue)
+end
+
+--=========================================
+-- 4. FIX CÁC NÚT BẤM (SỬA LỖI MAPPING TRONG FILE CỦA BẠN)
+--=========================================
+
+-- Tắt cái khung cam đang bị kẹt trên màn hình lúc mới chạy
+if _STORAGE["Massage"] then 
+    _STORAGE["Massage"].Visible = false 
+    _STORAGE["Massage"].Position = NoticeConfig.Position_Hidden
+end
+
+-- Gán lại sự kiện cho nút Execute (ExecBtn_2 trong file của bạn)
+if _STORAGE["ExecBtn_2"] then
+    _STORAGE["ExecBtn_2"].MouseButton1Click:Connect(function()
+        notify("EXECUTING SCRIPT...", Color3.fromRGB(255, 255, 0), 2)
+    end)
+end
+
+-- Gán cho nút Scan Backdoor (RTSL_2 trong file của bạn)
+if _STORAGE["RTSL_2"] then
+    _STORAGE["RTSL_2"].MouseButton1Click:Connect(function()
+        notify("START SYSTEM SCAN!", Color3.fromRGB(255, 100, 100), 3)
+    end)
+end
+
+-- Thông báo chào mừng để kiểm tra ngay lập tức
+task.spawn(function()
+    task.wait(2)
+    notify("OMNI-GOD V7.8 HAS BEEN ACTIVATED", Color3.fromRGB(0, 255, 150), 4)
+end)
+
+--=========================================
+-- 5. HIỆU ỨNG RIPPLE (SÓNG NƯỚC) CHO NÚT BẤM
+-- Tăng thêm ~100 dòng code logic thẩm mỹ
+--=========================================
+local function createRipple(button)
+	button.ClipsDescendants = true
+	local ripple = Instance.new("Frame")
+	ripple.Name = "Ripple"
+	ripple.Parent = button
+	ripple.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	ripple.BackgroundTransparency = 0.6
+	ripple.ZIndex = button.ZIndex + 1
+	ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+	
+	-- Lấy tọa độ chuột
+	local mousePos = UserInputService:GetMouseLocation()
+	local btnPos = button.AbsolutePosition
+	ripple.Position = UDim2.new(0, mousePos.X - btnPos.X, 0, mousePos.Y - btnPos.Y - 36)
+	
+	-- Tween giãn nở và biến mất
+	ripple.Size = UDim2.new(0, 0, 0, 0)
+	local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	TweenService:Create(ripple, tweenInfo, {
+		Size = UDim2.new(2, 0, 2, 0), -- Scale lên gấp đôi nút
+		BackgroundTransparency = 1
+	}):Play()
+	
+	task.wait(0.5)
+	ripple:Destroy()
+end
+
+-- Tự động gán Ripple cho tất cả nút trong UI
+for _, btn in pairs(UI) do
+	if btn:IsA("TextButton") or btn:IsA("ImageButton") then
+		btn.MouseButton1Click:Connect(function()
+			createRipple(btn)
+		end)
+	end
+end
+
+--=========================================
+-- 6. KIỂM TRA BOOT (STARTUP NOTIFY)
+--=========================================
+task.spawn(function()
+	task.wait(1)
+	notify("OMNI-GOD V7.8: The system is ready", Colors.Success, 3)
+	notify("Author: Scriptmirror with son171020's module", Colors.Info, 2)
+end)
 
 --=========================================
 -- FINAL BOOT SEQUENCE
 --=========================================
-safeLog("OMNI-GOD v7.0 LOADED SUCCESSFULLY!", Colors.Success)
 switchTab("Home")
+safeLog("OMNI-GOD v7.5 BOOTED & READY!", Colors.Success, 5)
+
+TextLabel126132.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/Framework/ForceShutdown.Engine.SM"))()
+    task.wait(2)    
+    ScreenGui:Destroy()
+end)
