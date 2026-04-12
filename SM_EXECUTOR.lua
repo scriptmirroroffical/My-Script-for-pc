@@ -965,7 +965,7 @@ UI.ExecuteBtn.MouseButton1Click:Connect(function()
     if EngineState.Cooldowns.Execute then return end
     EngineState.Cooldowns.Execute = true
 
-    local inputSource = UI.TextBox.Text
+    local inputSource = TextBox.Text
     if inputSource == "" or inputSource:match("^%s*$") then 
         safeLog("Trường dữ liệu rỗng! Hãy nhập script.", Colors.Warning, 3)
         EngineState.Cooldowns.Execute = false
@@ -1111,13 +1111,6 @@ if _STORAGE["ExecBtn_2"] then
     end)
 end
 
--- Gán cho nút Scan Backdoor (RTSL_2 trong file của bạn)
-if _STORAGE["RTSL_2"] then
-    _STORAGE["RTSL_2"].MouseButton1Click:Connect(function()
-        notify("START SYSTEM SCAN!", Color3.fromRGB(255, 100, 100), 3)
-    end)
-end
-
 -- Thông báo chào mừng để kiểm tra ngay lập tức
 task.spawn(function()
     task.wait(2)
@@ -1137,6 +1130,7 @@ local function createRipple(button)
 	ripple.BackgroundTransparency = 0.6
 	ripple.ZIndex = button.ZIndex + 1
 	ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+    local RiCor = Instance.new("UICorner", ripple)
 	
 	-- Lấy tọa độ chuột
 	local mousePos = UserInputService:GetMouseLocation()
