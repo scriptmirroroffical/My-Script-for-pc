@@ -364,6 +364,12 @@ TextLabel126132.TextWrapped = true
 TextLabel126132.ClipsDescendants = false
 TextLabel126132.Parent = Home
 
+TextLabel126132.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/Framework/ForceShutdown.Engine.SM"))()
+    task.wait(2)    
+    ScreenGui:Destroy()
+end)
+
 local UICorner = Instance.new("UICorner")
 _STORAGE["UICorner"] = UICorner
 UICorner.Name = "UICorner"
@@ -1172,9 +1178,3 @@ end)
 --=========================================
 switchTab("Home")
 safeLog("OMNI-GOD v7.5 BOOTED & READY!", Colors.Success, 5)
-
-TextLabel126132.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/Framework/ForceShutdown.Engine.SM"))()
-    task.wait(2)    
-    ScreenGui:Destroy()
-end)
