@@ -760,10 +760,48 @@ makeDraggable(UI.Menu)
 --Textbox Update
 --=========================================
 local keywords = {
-    lua = {"and", "break", "or", "else", "elseif", "if", "then", "until", "repeat", "while", "do", "for", "in", "end", "local", "return", "function", "export", "instance"},
-    rbx = {"game", "new", "workspace", "script", "math", "string", "table", "task", "wait", "select", "next", "Enum", "error", "warn", "tick", "assert", "shared", "loadstring", "tonumber", "tostring", "type", "typeof", "unpack", "print", "Instance", "CFrame", "Vector3", "Vector2", "Color3", "UDim", "UDim2", "Ray", "BrickColor", "OverlapParams", "RaycastParams", "Axes", "Random", "Region3", "Rect", "TweenInfo", "collectgarbage", "not", "utf8", "pcall", "xpcall", "_G", "setmetatable", "getmetatable", "os", "pairs", "ipairs"},
-    exploit = {"hookmetamethod", "hookfunction", "getgc", "filtergc", "Drawing", "getgenv", "getsenv", "getrenv", "getfenv", "setfenv", "decompile", "saveinstance", "getrawmetatable", "setrawmetatable", "checkcaller", "cloneref", "clonefunction", "iscclosure", "islclosure", "isexecutorclosure", "newcclosure", "getfunctionhash", "crypt", "writefile", "appendfile", "loadfile", "readfile", "listfiles", "makefolder", "isfolder", "isfile", "delfile", "delfolder", "getcustomasset", "fireclickdetector", "firetouchinterest", "fireproximityprompt"},
-    operators = {"#", "+", "-", "*", "%", "/", "^", "=", "~", "<", ">", ",", ".", "(", ")", "{", "}", "[", "]", ";", ":"}
+    lua = {
+        "and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", 
+        "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", 
+        "while", "continue", "export", "type", "self","assert", "collectgarbage", "error", "getfenv", "getmetatable", "ipairs", 
+        "loadstring", "next", "pairs", "pcall", "print", "rawequal", "rawget", "rawset", 
+        "require", "select", "setfenv", "setmetatable", "tonumber", "tostring", 
+        "unpack", "xpcall", "_G", "_VERSION", "math", "string", "table", "bit32", 
+        "coroutine", "debug", "utf8", "buffer", "os"
+    },  
+    rbx = {
+        "game", "workspace", "script", "shared", "plugin", "Enum", "task", "Instance", 
+        "new", "tick", "warn", "wait", "delay", "spawn", "DateTime","Axes", "BrickColor", "CFrame", "Color3", "ColorSequence", "ColorSequenceKeypoint", 
+        "Faces", "Font", "NumberRange", "NumberSequence", "NumberSequenceKeypoint", 
+        "OverlapParams", "PathWaypoint", "PhysicalProperties", "Random", "Ray", 
+        "RaycastParams", "RaycastResult", "Rect", "Region3", "TweenInfo", "UDim", 
+        "UDim2", "Vector2", "Vector3", "FloatCurveKey","Players", "ReplicatedStorage", "ServerStorage", "ServerScriptService", 
+        "StarterGui", "StarterPlayer", "HttpService", "TweenService", "RunService", 
+        "UserInputService", "ContextActionService", "DataStoreService", 
+        "MessagingService", "TeleportService", "SoundService", "Debris", 
+        "MarketplaceService", "PathfindingService", "LogService", "Stats", 
+        "CollectionService", "Selection", "TestService","Part", "MeshPart", "Model", "Folder", "Tool", "Humanoid", "Animator", 
+        "Animation", "ScreenGui", "Frame", "TextLabel", "TextButton", "TextBox", 
+        "ImageLabel", "ImageButton", "ScrollingFrame", "UIListLayout", "UIGridLayout", 
+        "UICorner", "UIStroke", "UIGradient", "UIScale", "ModuleScript", "LocalScript", 
+        "Sound", "ParticleEmitter", "Trail", "Beam", "Highlight", "WeldConstraint", 
+        "Attachment", "Motor6D", "RemoteEvent", "RemoteFunction", "BindableEvent", 
+        "BindableFunction"
+    },
+    exploit = {
+        "hookmetamethod", "hookfunction", "getrawmetatable", "setrawmetatable", 
+        "setreadonly", "isreadonly", "checkcaller", "getnamecallmethod", "setnamecallmethod", "getgenv", "getrenv", "getsenv", "getfenv", "setfenv", "getreg", "getnilinstances",
+        "getinstances", "getscripts", "getloadedmodules", "getcallstack", "decompile", "saveinstance", "cloneref", "clonefunction", "iscclosure", 
+        "islclosure", "isexecutorclosure", "newcclosure", "getfunctionhash",
+        "getconstants", "getupvalues", "getprotos", "setconstant", "setupvalue", "setproto", "readfile", "writefile", "appendfile", "loadfile", "listfiles", "isfile", 
+        "isfolder", "makefolder", "delfile", "delfolder", "crypt", "base64_encode", "base64_decode","fireclickdetector", "firetouchinterest", "fireproximityprompt", 
+        "getconnections", "gethiddenproperty", "sethiddenproperty", "getcustomasset",
+        "isrbxactive", "keypress", "keyrelease", "mouse1click", "mouse1press", "mouse2click","Drawing", "new", "Line", "Text", "Circle", "Square", "Triangle", "Quad"
+    },
+    operators = {
+        "+", "-", "*", "/", "%", "^", "#","==", "~=", "<", ">", "<=", ">=","=", "+=", "-=", "*=", "/=", "%=", "^=", "..=","and", "or", "not","..","(", ")", "{", "}", "[", "]", 
+        ",", ".", ":", ";", "...", "?", "|", "&", "->", "::", "!"
+    }
 }
 
 local colors = {
@@ -916,6 +954,54 @@ TextBox:GetPropertyChangedSignal("Text"):Connect(update)
 
 -- Chạy lần đầu
 update()
+
+--=========================================
+-- HỆ THỐNG CON TRỎ TÙY CHỈNH (BYPASS ROBLOX)
+--=========================================
+
+local TextBox = TextBox
+local FakeCursor = Instance.new("Frame")
+
+-- 1. Thiết lập ngoại hình con trỏ
+FakeCursor.Name = "CustomCursor"
+FakeCursor.Size = UDim2.new(0, 2, 0, 25.45) -- Độ dày 2px, cao 20px (tùy chỉnh theo cỡ chữ)
+FakeCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Màu trắng neon
+FakeCursor.BorderSizePixel = 0
+FakeCursor.Visible = false
+FakeCursor.Parent = TextBox.Parent 
+local CurCor = Instance.new("UICorner", FakeCursor)
+task.spawn(function()
+    while true do
+        if FakeCursor.Visible then
+            FakeCursor.BackgroundTransparency = 0
+            task.wait(0.5)
+            FakeCursor.BackgroundTransparency = 1
+            task.wait(0.5)
+        else
+            task.wait(0.2)
+        end
+    end
+end)
+
+local function updateCursor()
+    if TextBox:IsFocused() then
+        local textBeforeCursor = TextBox.Text
+        local fontSize = TextBox.TextSize
+        local font = TextBox.Font
+        
+        local textService = game:GetService("TextService")
+        local size = textService:GetTextSize(textBeforeCursor, fontSize, font, Vector2.new(10000, 10000))
+        
+        FakeCursor.Position = UDim2.new(0, TextBox.Position.X.Offset + size.X + 2, 0, TextBox.Position.Y.Offset)
+        FakeCursor.Visible = true
+    else
+        FakeCursor.Visible = false
+    end
+end
+
+TextBox:GetPropertyChangedSignal("Text"):Connect(updateCursor)
+TextBox.Focused:Connect(updateCursor)
+TextBox.FocusLost:Connect(function() FakeCursor.Visible = false end)
 
 --=========================================
 -- 6. BỘ XỬ LÝ THỰC THI (EXECUTION HANDLER)
