@@ -82,6 +82,17 @@ for _, oldGui in ipairs(playerGui:GetChildren()) do
 	end
 end
 
+--Scale automatic
+
+local camera = workspace.CurrentCamera
+local screenSize = camera.ViewportSize
+
+local offsetWidth = 300
+local offsetHeight = 420
+
+local scaleX = offsetWidth / screenSize.X
+local scaleY = offsetHeight / screenSize.Y
+
 -- 2. LOADING SCREEN (Tối ưu hóa)
 local loadGui = Instance.new("ScreenGui")
 loadGui.Name = "LoadingUI_Final"
@@ -140,13 +151,14 @@ mainGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 300, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -210)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 mainFrame.Parent = mainGui
+mainFrame.Size = UDim2.new(scaleX, 0, scaleY, 0)
 makeDraggable(mainFrame)
 
 -- Thanh tiêu đề (Dùng để kéo)
@@ -157,14 +169,20 @@ Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 titleBar.Parent = mainFrame
 
 local titleText = Instance.new("TextLabel")
-titleText.Size = UDim2.new(1, -40, 1, 0)
-titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.Size = UDim2.new(0.9, 0, 1, 0)
+titleText.Position = UDim2.new(0.05, 0, 0, 0)
 titleText.Text = "STATS CONTROLLER V7.5"
 titleText.TextColor3 = Color3.new(1, 1, 1)
 titleText.Font = Enum.Font.GothamBold
 titleText.TextXAlignment = Enum.TextXAlignment.Left
 titleText.BackgroundTransparency = 1
+TextScaled = true
 titleText.Parent = titleBar
+
+local textSizeConstraint = Instance.new("UITextSizeConstraint")
+textSizeConstraint.MaxTextSize = 18 
+textSizeConstraint.MinTextSize = 10 
+textSizeConstraint.Parent = titleText
 
 -- Scrolling Content (Chống tràn nút)
 local scroll = Instance.new("ScrollingFrame")
@@ -208,6 +226,7 @@ local function addInput(text, key, default)
 	local lbl = Instance.new("TextLabel")
 	lbl.Size = UDim2.new(0.5, 0, 1, 0)
 	lbl.Text = text
+    lbl.TextSize = 15
 	lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 	lbl.Font = Enum.Font.Gotham
 	lbl.BackgroundTransparency = 1
