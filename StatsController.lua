@@ -92,7 +92,6 @@ local bg = Instance.new("Frame")
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.BackgroundTransparency = 0.2
-makeDraggable(bg)
 bg.Parent = loadGui
 
 local loadMain = Instance.new("Frame")
@@ -148,6 +147,7 @@ mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 mainFrame.Parent = mainGui
+makeDraggable(mainFrame)
 
 -- Thanh tiêu đề (Dùng để kéo)
 local titleBar = Instance.new("Frame")
