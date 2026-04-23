@@ -58,6 +58,11 @@ local scripts = {
         Name = "hitbox_extender.lua",
         Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/hitbox_extender.lua",
         Description = "Extend players' hitbox"
+    },
+    {
+        Name = "Protector.luau",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/main/Protector.luau",
+        Description = "Protect you from malicious"
     }
 }
 
