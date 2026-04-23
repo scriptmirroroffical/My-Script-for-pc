@@ -210,42 +210,42 @@ miniBtn.Parent = titleBar
 
 local isMini = false
 miniBtn.MouseButton1Click:Connect(function()
-	isMini = not isMini
-	mainFrame:TweenSize(isMini and UDim2.new(0, 300, 0, 40) or UDim2.new(0, 300, 0, 420), "Out", "Quad", 0.3, true)
-	scroll.Visible = not isMini
-	miniBtn.Text = isMini and "+" or "-"
+    isMini = not isMini
+    mainFrame:TweenSize(isMini and UDim2.new(0, 300, 0, 40) or UDim2.new(0, 300, 0, 420), "Out", "Quad", 0.3, true)
+    scroll.Visible = not isMini
+    miniBtn.Text = isMini and "+" or "-"
 end)
 
 -- HÀM TẠO INPUT
 local function addInput(text, key, default)
-	local container = Instance.new("Frame")
-	container.Size = UDim2.new(0.95, 0, 0, 45)
-	container.BackgroundTransparency = 1
-	container.Parent = scroll
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(0.95, 0, 0, 45)
+    container.BackgroundTransparency = 1
+    container.Parent = scroll
 
-	local lbl = Instance.new("TextLabel")
-	lbl.Size = UDim2.new(0.5, 0, 1, 0)
-	lbl.Text = text
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.5, 0, 1, 0)
+    lbl.Text = text
     lbl.TextSize = 15
-	lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
-	lbl.Font = Enum.Font.Gotham
-	lbl.BackgroundTransparency = 1
-	lbl.TextXAlignment = Enum.TextXAlignment.Left
-	lbl.Parent = container
+    lbl.TextColor3 = Color3.fromRGB(180, 180, 180)
+    lbl.Font = Enum.Font.Gotham
+    lbl.BackgroundTransparency = 1
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = container
 
-	local box = Instance.new("TextBox")
-	box.Size = UDim2.new(0.4, 0, 0.7, 0)
-	box.Position = UDim2.new(0.55, 0, 0.15, 0)
-	box.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-	box.Text = tostring(default)
-	box.TextColor3 = Color3.new(1, 1, 1)
-	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
-	box.Parent = container
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0.4, 0, 0.7, 0)
+    box.Position = UDim2.new(0.55, 0, 0.15, 0)
+    box.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    box.Text = tostring(default)
+    box.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
+    box.Parent = container
 
-	box.FocusLost:Connect(function()
-		local n = tonumber(box.Text)
-		if n then stats[key] = n else box.Text = tostring(stats[key]) end
-	end)
+    box.FocusLost:Connect(function()
+        local n = tonumber(box.Text)
+        if n then stats[key] = n else box.Text = tostring(stats[key]) end
+    end)
 end
 
 addInput("Speed", "speed", 16)
@@ -255,43 +255,63 @@ addInput("Fly Speed", "flySpeed", 50)
 
 -- HÀM TẠO TOGGLE
 local function addToggle(text, key, color)
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0.95, 0, 0, 40)
-	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	btn.Text = text .. ": OFF"
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.GothamBold
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
-	btn.Parent = scroll
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.95, 0, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.Text = text .. ": OFF"
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    btn.Parent = scroll
 
-	local function refresh()
-		btn.Text = text .. ": " .. (stats[key] and "ON" or "OFF")
-		btn.BackgroundColor3 = stats[key] and color or Color3.fromRGB(40, 40, 40)
-	end
+    local function refresh()
+        btn.Text = text .. ": " .. (stats[key] and "ON" or "OFF")
+        btn.BackgroundColor3 = stats[key] and color or Color3.fromRGB(40, 40, 40)
+    end
 
-	btn.MouseButton1Click:Connect(function()
-		stats[key] = not stats[key]
-		refresh()
-		-- Fly Setup
-		if key == "flying" then
-			local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-			if stats.flying and hrp then
-				local bv = Instance.new("BodyVelocity", hrp)
-				bv.Name = "FlyVel"
-				bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-				local bg = Instance.new("BodyGyro", hrp)
-				bg.Name = "FlyGyro"
-				bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-			else
-				if hrp then
-					if hrp:FindFirstChild("FlyVel") then hrp.FlyVel:Destroy() end
-					if hrp:FindFirstChild("FlyGyro") then hrp.FlyGyro:Destroy() end
-					if player.Character:FindFirstChild("Humanoid") then player.Character.Humanoid.PlatformStand = false end
-				end
-			end
-		end
-	end)
-end
+    btn.MouseButton1Click:Connect(function()
+        stats[key] = not stats[key]
+        refresh()
+        
+        -- Fly Setup
+        if key == "flying" then
+            local char = player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local hum = char and char:FindFirstChild("Humanoid")
+            
+            if stats.flying and hrp and hum then
+                -- Tạo BodyVelocity mới nếu chưa có
+                local bv = hrp:FindFirstChild("FlyVel") or Instance.new("BodyVelocity")
+                bv.Name = "FlyVel"
+                bv.MaxForce = Vector3.new(1, 1, 1) * math.huge
+                bv.Velocity = Vector3.new(0, 0.1, 0)
+                bv.Parent = hrp
+                
+                -- Tạo BodyGyro mới nếu chưa có
+                local bg = hrp:FindFirstChild("FlyGyro") or Instance.new("BodyGyro")
+                bg.Name = "FlyGyro"
+                bg.MaxTorque = Vector3.new(1, 1, 1) * math.huge
+                bg.CFrame = workspace.CurrentCamera.CFrame
+                bg.Parent = hrp
+                
+                hum.PlatformStand = true
+            else
+                -- Dọn dẹp khi tắt
+                if hrp then
+                    local bv = hrp:FindFirstChild("FlyVel")
+                    local bg = hrp:FindFirstChild("FlyGyro")
+                    if bv then bv:Destroy() end
+                    if bg then bg:Destroy() end
+                end
+                
+                if hum then
+                    hum.PlatformStand = false
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
+            end
+        end
+    end)
+end -- CHỖ NÀY LÚC TRƯỚC BỊ THIẾU END! ĐÃ ĐƯỢC FIX.
 
 addToggle("NOCLIP", "noClip", Color3.fromRGB(180, 50, 50))
 addToggle("FLY", "flying", Color3.fromRGB(120, 50, 180))
@@ -301,61 +321,65 @@ addToggle("SPAM STEAL", "spamSteal", Color3.fromRGB(0, 160, 80))
 -- 4. LOGIC HỆ THỐNG
 local cachedParts = {}
 local function updateCache()
-	cachedParts = {}
-	if not player.Character then return end
-	for _, p in ipairs(player.Character:GetDescendants()) do
-		if p:IsA("BasePart") then table.insert(cachedParts, p) end
-	end
+    cachedParts = {}
+    if not player.Character then return end
+    for _, p in ipairs(player.Character:GetDescendants()) do
+        if p:IsA("BasePart") then table.insert(cachedParts, p) end
+    end
 end
 player.CharacterAdded:Connect(function() task.wait(0.5) updateCache() end)
 updateCache()
 
 -- MAIN LOOP
 RunService.Heartbeat:Connect(function()
-	local char = player.Character
-	local hum = char and char:FindFirstChild("Humanoid")
-	local hrp = char and char:FindFirstChild("HumanoidRootPart")
-	if not hum or not hrp then return end
+    local char = player.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hum or not hrp then return end
 
-	-- Maintain
-	if stats.autoMaintain and not stats.flying then
-		hum.WalkSpeed = stats.speed
-		hum.JumpPower = stats.jump
-	end
+    -- Maintain
+    if stats.autoMaintain and not stats.flying then
+        hum.WalkSpeed = stats.speed
+        hum.JumpPower = stats.jump
+    end
 
-	-- Fly
-	if stats.flying then
-		local bv = hrp:FindFirstChild("FlyVel")
-		local bg = hrp:FindFirstChild("FlyGyro")
-		if bv and bg then
-			local dir = Vector3.new(0,0,0)
-			local cam = workspace.CurrentCamera.CFrame
-			if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += cam.LookVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= cam.LookVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= cam.RightVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += cam.RightVector end
-			bv.Velocity = dir.Magnitude > 0 and (dir.Unit * stats.flySpeed) or Vector3.new(0,0.1,0)
-			bg.CFrame = cam
-			hum.PlatformStand = true
-		end
-	end
+    -- Fly logic
+    if stats.flying then
+        local bv = hrp:FindFirstChild("FlyVel")
+        local bg = hrp:FindFirstChild("FlyGyro")
+        if bv and bg then
+            local moveDir = hum.MoveDirection
+            if moveDir.Magnitude > 0 then
+                bv.Velocity = moveDir * stats.flySpeed
+            else
+                bv.Velocity = Vector3.new(0, 0.1, 0)
+            end
+            bg.CFrame = workspace.CurrentCamera.CFrame
+            hum.PlatformStand = true
+        end
+    end -- Đã bỏ else hum.PlatformStand = false ở đây để tránh giật lag animation
 
-	-- NoClip
-	if stats.noClip then
-		for _, p in ipairs(cachedParts) do p.CanCollide = false end
-	end
+    -- NoClip
+    if stats.noClip then
+        for _, p in ipairs(cachedParts) do 
+            if p.CanCollide then
+                p.CanCollide = false 
+            end
+        end
+    end
 end)
 
 -- Spam Loop
 task.spawn(function()
-	while task.wait(0.3) do
-		if stats.spamSteal and player.Character and player.Character:FindFirstChild("Humanoid") then
-			local hum = player.Character.Humanoid
-			if hum.Health < stats.health then
-				hum.Health = stats.health
-			end
-		end
-	end
+    while task.wait(0.3) do
+        if stats.spamSteal and player.Character and player.Character:FindFirstChild("Humanoid") then
+            local hum = player.Character.Humanoid
+            -- Fix: Đảm bảo nhân vật còn sống mới chỉnh Health
+            if hum.Health > 0 and hum.Health < stats.health then
+                hum.Health = stats.health
+            end
+        end
+    end
 end)
 
 print("⚡ Stats Controller V7.5: GUI Error Fixed & Optimized!")
