@@ -1,0 +1,157 @@
+-- [OMNI-GOD CORE GENERATED]
+-- Author: son171020
+-- Mode: Smart Relay (_G.OmniStorage)
+local _STORAGE = _G.OmniStorage or {}
+
+local ScreenGui = Instance.new("ScreenGui")
+_STORAGE["ScreenGui"] = ScreenGui
+ScreenGui.Name = "ScreenGui"
+ScreenGui.Parent = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui')
+
+local Frame = Instance.new("Frame")
+_STORAGE["Frame"] = Frame
+Frame.Name = "Frame"
+Frame.Size = UDim2.new(0, 84, 0, 40)
+Frame.Position = UDim2.new(0.408570617, 0, 0.138888896, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(156, 156, 156)
+Frame.BackgroundTransparency = 0.5
+Frame.Visible = true
+Frame.ZIndex = 1
+Frame.BorderSizePixel = 0
+Frame.ClipsDescendants = false
+Frame.Parent = _STORAGE["ScreenGui"] or ScreenGui
+
+local TextButton = Instance.new("TextButton")
+_STORAGE["TextButton"] = TextButton
+TextButton.Name = "TextButton"
+TextButton.Size = UDim2.new(0, 72, 0, 32)
+TextButton.Position = UDim2.new(0.0660211444, 0, 0.0811073333, 0)
+TextButton.Text = "ESP"
+TextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+TextButton.BackgroundTransparency = 0
+TextButton.TextTransparency = 0
+TextButton.Visible = true
+TextButton.ZIndex = 1
+TextButton.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextButton.Font = Enum.Font.SourceSans
+TextButton.TextScaled = true
+TextButton.TextSize = 14
+TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.TextXAlignment = Enum.TextXAlignment.Center
+TextButton.TextYAlignment = Enum.TextYAlignment.Center
+TextButton.TextWrapped = true
+TextButton.ClipsDescendants = false
+TextButton.Parent = _STORAGE["Frame"] or Frame
+
+local UICorner = Instance.new("UICorner")
+_STORAGE["UICorner"] = UICorner
+UICorner.Name = "UICorner"
+UICorner.Parent = _STORAGE["TextButton"] or TextButton
+
+local UICorner_2 = Instance.new("UICorner")
+_STORAGE["UICorner_2"] = UICorner_2
+UICorner_2.Name = "UICorner"
+UICorner_2.Parent = _STORAGE["Frame"] or Frame
+
+local UIStroke = Instance.new("UIStroke")
+_STORAGE["UIStroke"] = UIStroke
+UIStroke.Name = "UIStroke"
+UIStroke.ZIndex = 1
+UIStroke.Parent = _STORAGE["Frame"] or Frame
+
+_G.OmniStorage = _STORAGE
+
+-- [[ OMNI-GOD ESP CORE + TEAM COLOR ]]
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local ESP_SETTINGS = {
+	Enabled = false,
+	BoxColor = Color3.fromRGB(0, 255, 255), -- Màu khung giữ nguyên Cyan cho chuyên nghiệp
+	DefaultTextColor = Color3.fromRGB(255, 255, 255),
+	TextSize = 16
+}
+
+local function CreateESP(player)
+	local Box = Drawing.new("Square")
+	Box.Visible = false
+	Box.Color = ESP_SETTINGS.BoxColor
+	Box.Thickness = 1
+	Box.Transparency = 1
+	Box.Filled = false
+
+	local NameTag = Drawing.new("Text")
+	NameTag.Visible = false
+	NameTag.Center = true
+	NameTag.Outline = true
+	NameTag.Size = ESP_SETTINGS.TextSize
+
+	local function Update()
+		local Connection
+		Connection = RunService.RenderStepped:Connect(function()
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
+				local RootPart = player.Character.HumanoidRootPart
+				local Head = player.Character:FindFirstChild("Head")
+
+				if Head then
+					local RootPos, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
+					local HeadPos = Camera:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.6, 0))
+					local LegPos = Camera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3.3, 0))
+
+					if OnScreen and ESP_SETTINGS.Enabled then
+						-- 1. Cập nhật Khung (Box) áp sát
+						local BoxHeight = math.abs(HeadPos.Y - LegPos.Y)
+						local BoxWidth = BoxHeight / 1.8
+
+						Box.Size = Vector2.new(BoxWidth, BoxHeight)
+						Box.Position = Vector2.new(RootPos.X - BoxWidth / 2, RootPos.Y - BoxHeight / 2)
+						Box.Visible = true
+
+						-- 2. Xử lý Team & Màu sắc
+						local TeamName = player.Team and player.Team.Name or "No Team"
+						local TeamColor = player.TeamColor and player.TeamColor.Color or ESP_SETTINGS.DefaultTextColor
+
+						-- 3. Cập nhật Text (Tên | Team | Khoảng cách)
+						local Distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)
+						NameTag.Text = string.format("%s [%s]\n%d studs", player.Name, TeamName, Distance)
+						NameTag.Color = TeamColor -- Màu chữ theo màu Team
+						NameTag.Position = Vector2.new(RootPos.X, RootPos.Y - BoxHeight / 2 - 30)
+						NameTag.Visible = true
+					else
+						Box.Visible = false
+						NameTag.Visible = false
+					end
+				end
+			else
+				Box.Visible = false
+				NameTag.Visible = false
+				if not player.Parent then
+					Box:Remove()
+					NameTag:Remove()
+					Connection:Disconnect()
+				end
+			end
+		end)
+	end
+	coroutine.wrap(Update)()
+end
+
+-- Khởi tạo ban đầu
+for _, player in pairs(Players:GetPlayers()) do
+	CreateESP(player)
+end
+Players.PlayerAdded:Connect(CreateESP)
+
+-- Điều khiển nút bấm từ GUI của bạn
+local ToggleBtn = _STORAGE["TextButton"]
+local IsOn = false
+
+ToggleBtn.MouseButton1Click:Connect(function()
+	IsOn = not IsOn
+	ESP_SETTINGS.Enabled = IsOn
+	ToggleBtn.Text = IsOn and "ESP: ON" or "ESP: OFF"
+	ToggleBtn.BackgroundColor3 = IsOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 255, 255)
+end)
