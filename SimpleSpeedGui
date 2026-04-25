@@ -1,0 +1,250 @@
+-- [OMNI-GOD CORE GENERATED]
+-- Author: son171020
+-- Mode: Smart Relay (_G.OmniStorage)
+local _STORAGE = _G.OmniStorage or {}
+
+local SIMPLESPEEDGUI = Instance.new("ScreenGui")
+_STORAGE["SIMPLESPEEDGUI"] = SIMPLESPEEDGUI
+SIMPLESPEEDGUI.Name = "SIMPLESPEEDGUI"
+SIMPLESPEEDGUI.ResetOnSpawn = false
+SIMPLESPEEDGUI.Parent = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui')
+
+local Name = Instance.new("TextLabel")
+_STORAGE["Name"] = Name
+Name.Name = "Name"
+Name.Size = UDim2.new(0.0849721208, 0, 0.0295138881, 0)
+Name.Position = UDim2.new(0.12063399, 0, 0.0798611119, 0)
+Name.Text = "SIMPLE SPEED GUI V4 FE "
+Name.BackgroundColor3 = Color3.fromRGB(221, 255, 0)
+Name.BackgroundTransparency = 0
+Name.TextTransparency = 0
+Name.Visible = true
+Name.ZIndex = 1
+Name.FontFace = Font.new("rbxasset://fonts/families/GrenzeGotisch.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+Name.Font = Enum.Font.GrenzeGotisch
+Name.TextScaled = true
+Name.TextSize = 14
+Name.TextColor3 = Color3.fromRGB(0, 0, 0)
+Name.BorderSizePixel = 0
+Name.TextXAlignment = Enum.TextXAlignment.Center
+Name.TextYAlignment = Enum.TextYAlignment.Center
+Name.TextWrapped = true
+Name.ClipsDescendants = false
+Name.Parent = _STORAGE["SIMPLESPEEDGUI"] or SIMPLESPEEDGUI
+
+local Main = Instance.new("Frame")
+_STORAGE["Main"] = Main
+Main.Name = "Main"
+Main.Size = UDim2.new(0.0999412984, 0, 0.0789930522, 0)
+Main.Position = UDim2.new(0.12063399, 0, 0.109375, 0)
+Main.BackgroundColor3 = Color3.fromRGB(221, 255, 0)
+Main.BackgroundTransparency = 0.5
+Main.Visible = true
+Main.ZIndex = 1
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = false
+Main.Parent = _STORAGE["SIMPLESPEEDGUI"] or SIMPLESPEEDGUI
+
+local TextBox = Instance.new("TextBox")
+_STORAGE["TextBox"] = TextBox
+TextBox.Name = "TextBox"
+TextBox.Size = UDim2.new(0.466960341, 0, 0.373626381, 0)
+TextBox.Position = UDim2.new(0.0352422893, 0, 0.0858399123, 0)
+TextBox.Text = "16"
+TextBox.BackgroundColor3 = Color3.fromRGB(144, 144, 144)
+TextBox.BackgroundTransparency = 0
+TextBox.TextTransparency = 0
+TextBox.Visible = true
+TextBox.ZIndex = 1
+TextBox.FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextBox.Font = Enum.Font.RobotoMono
+TextBox.TextScaled = true
+TextBox.TextSize = 14
+TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.BorderSizePixel = 0
+TextBox.TextXAlignment = Enum.TextXAlignment.Center
+TextBox.TextYAlignment = Enum.TextYAlignment.Center
+TextBox.TextWrapped = true
+TextBox.ClipsDescendants = false
+TextBox.Parent = _STORAGE["Main"] or Main
+
+local TextButton = Instance.new("TextButton")
+_STORAGE["TextButton"] = TextButton
+TextButton.Name = "TextButton"
+TextButton.Size = UDim2.new(0.396475762, 0, 0.373626381, 0)
+TextButton.Position = UDim2.new(0.572687209, 0, 0.0769230798, 0)
+TextButton.Text = "SET"
+TextButton.BackgroundColor3 = Color3.fromRGB(1, 255, 255)
+TextButton.BackgroundTransparency = 0
+TextButton.TextTransparency = 0
+TextButton.Visible = true
+TextButton.ZIndex = 1
+TextButton.FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextButton.Font = Enum.Font.RobotoMono
+TextButton.TextScaled = true
+TextButton.TextSize = 14
+TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.TextXAlignment = Enum.TextXAlignment.Center
+TextButton.TextYAlignment = Enum.TextYAlignment.Center
+TextButton.TextWrapped = true
+TextButton.ClipsDescendants = false
+TextButton.Parent = _STORAGE["Main"] or Main
+
+local TextButton_2 = Instance.new("TextButton")
+_STORAGE["TextButton_2"] = TextButton_2
+TextButton_2.Name = "TextButton"
+TextButton_2.Size = UDim2.new(0.933920681, 0, 0.373626381, 0)
+TextButton_2.Position = UDim2.new(0.0352422893, 0, 0.538461566, 0)
+TextButton_2.Text = "SPAM SET"
+TextButton_2.BackgroundColor3 = Color3.fromRGB(255, 239, 12)
+TextButton_2.BackgroundTransparency = 0
+TextButton_2.TextTransparency = 0
+TextButton_2.Visible = true
+TextButton_2.ZIndex = 1
+TextButton_2.FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextButton_2.Font = Enum.Font.RobotoMono
+TextButton_2.TextScaled = true
+TextButton_2.TextSize = 14
+TextButton_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton_2.BorderSizePixel = 0
+TextButton_2.TextXAlignment = Enum.TextXAlignment.Center
+TextButton_2.TextYAlignment = Enum.TextYAlignment.Center
+TextButton_2.TextWrapped = true
+TextButton_2.ClipsDescendants = false
+TextButton_2.Parent = _STORAGE["Main"] or Main
+
+local TextButton_3 = Instance.new("TextButton")
+_STORAGE["TextButton_3"] = TextButton_3
+TextButton_3.Name = "TextButton"
+TextButton_3.Size = UDim2.new(0.0149691813, 0, 0.0295138881, 0)
+TextButton_3.Position = UDim2.new(0.205606118, 0, 0.0798611119, 0)
+TextButton_3.Text = "_"
+TextButton_3.BackgroundColor3 = Color3.fromRGB(166, 166, 166)
+TextButton_3.BackgroundTransparency = 0
+TextButton_3.TextTransparency = 0
+TextButton_3.Visible = true
+TextButton_3.ZIndex = 1
+TextButton_3.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+TextButton_3.Font = Enum.Font.SourceSans
+TextButton_3.TextScaled = true
+TextButton_3.TextSize = 14
+TextButton_3.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton_3.BorderSizePixel = 0
+TextButton_3.TextXAlignment = Enum.TextXAlignment.Center
+TextButton_3.TextYAlignment = Enum.TextYAlignment.Center
+TextButton_3.TextWrapped = true
+TextButton_3.ClipsDescendants = false
+TextButton_3.Parent = _STORAGE["SIMPLESPEEDGUI"] or SIMPLESPEEDGUI
+
+_G.OmniStorage = _STORAGE
+
+-- [[ OMNI-GOD CORE LOGIC V4 - FINAL VERSION ]] --
+
+local Player = game:GetService("Players").LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local isSpamming = false
+
+-----------------------------------------
+-- 1. HỆ THỐNG KÉO THẢ SIÊU MƯỢT (FIX LỆCH)
+-----------------------------------------
+local dragging, dragStart, startPositions = false, nil, {}
+
+local function UpdateGuiPosition(input)
+	local delta = input.Position - dragStart
+	for object, startPos in pairs(startPositions) do
+		object.Position = UDim2.new(
+			startPos.X.Scale, 
+			startPos.X.Offset + delta.X, 
+			startPos.Y.Scale, 
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end
+
+Name.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+
+		-- Chụp vị trí của cả 3 phần để di chuyển đồng bộ
+		startPositions = {
+			[Name] = Name.Position,
+			[Main] = Main.Position,
+			[TextButton_3] = TextButton_3.Position
+		}
+
+		local connection
+		connection = UserInputService.InputEnded:Connect(function(ReleasedInput)
+			if ReleasedInput.UserInputType == Enum.UserInputType.MouseButton1 or ReleasedInput.UserInputType == Enum.UserInputType.Touch then
+				dragging = false
+				connection:Disconnect()
+			end
+		end)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		UpdateGuiPosition(input)
+	end
+end)
+
+-----------------------------------------
+-- 2. HỆ THỐNG ĐIỀU KHIỂN TỐC ĐỘ & CHỐNG TRÔI
+-----------------------------------------
+local function SetFriction(character)
+	for _, part in pairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			-- Tăng độ bám đường lên mức tối đa
+			part.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5, 100, 100)
+		end
+	end
+end
+
+TextButton.MouseButton1Click:Connect(function()
+	local char = Player.Character
+	if char and char:FindFirstChild("Humanoid") then
+		char.Humanoid.WalkSpeed = tonumber(TextBox.Text) or 16
+		SetFriction(char)
+	end
+end)
+
+TextButton_2.MouseButton1Click:Connect(function()
+	isSpamming = not isSpamming
+	TextButton_2.Text = isSpamming and "SPAM: ON" or "SPAM SET"
+	TextButton_2.BackgroundColor3 = isSpamming and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 239, 12)
+end)
+
+-- Vòng lặp xử lý vật lý (Phanh gấp khi dừng lại)
+RunService.Heartbeat:Connect(function()
+	local char = Player.Character
+	local hum = char and char:FindFirstChild("Humanoid")
+	local root = char and char:FindFirstChild("HumanoidRootPart")
+
+	if hum and root then
+		-- Spam tốc độ nếu đang bật
+		if isSpamming then
+			hum.WalkSpeed = tonumber(TextBox.Text) or 16
+		end
+
+		-- LOGIC PHANH GẤP: Nếu không nhấn nút di chuyển
+		if hum.MoveDirection.Magnitude == 0 then
+			-- Ép vận tốc trượt về 0, giữ nguyên vận tốc rơi (Y)
+			root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+		end
+	end
+end)
+
+-- Thu nhỏ / Hiện Menu
+TextButton_3.MouseButton1Click:Connect(function()
+	Main.Visible = not Main.Visible
+	TextButton_3.Text = Main.Visible and "_" or "+"
+end)
+
+-- Tự động tối ưu vật lý khi hồi sinh
+Player.CharacterAdded:Connect(function(char)
+	char:WaitForChild("Humanoid")
+	SetFriction(char)
+end)
