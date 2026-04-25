@@ -62,96 +62,86 @@ UIStroke.Parent = _STORAGE["Frame"] or Frame
 
 _G.OmniStorage = _STORAGE
 
--- [[ OMNI-GOD ESP CORE + TEAM COLOR ]]
+-- [[ OMNI-GOD CHAMS CORE ]]
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
 local ESP_SETTINGS = {
-	Enabled = false,
-	BoxColor = Color3.fromRGB(0, 255, 255), -- Màu khung giữ nguyên Cyan cho chuyên nghiệp
-	DefaultTextColor = Color3.fromRGB(255, 255, 255),
-	TextSize = 16
+    Enabled = false,
+    FillTransparency = 0.5, -- Độ trong suốt của màu thân
+    OutlineTransparency = 0, -- Độ trong suốt của viền
 }
 
+-- Hàm tạo Highlight (giống trong hình) và Text
 local function CreateESP(player)
-	local Box = Drawing.new("Square")
-	Box.Visible = false
-	Box.Color = ESP_SETTINGS.BoxColor
-	Box.Thickness = 1
-	Box.Transparency = 1
-	Box.Filled = false
+    local function ApplyESP(character)
+        -- 1. Tạo Highlight (Hiệu ứng phủ màu như ảnh)
+        local Highlight = Instance.new("Highlight")
+        Highlight.Name = "OmniHighlight"
+        Highlight.Parent = character
+        Highlight.FillTransparency = ESP_SETTINGS.FillTransparency
+        Highlight.OutlineTransparency = ESP_SETTINGS.OutlineTransparency
+        Highlight.Adornee = character
+        Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Nhìn xuyên tường
 
-	local NameTag = Drawing.new("Text")
-	NameTag.Visible = false
-	NameTag.Center = true
-	NameTag.Outline = true
-	NameTag.Size = ESP_SETTINGS.TextSize
+        -- 2. Tạo BillboardGui (Hiện tên, team, studs)
+        local Billboard = Instance.new("BillboardGui")
+        Billboard.Name = "OmniTag"
+        Billboard.Size = UDim2.new(0, 200, 0, 50)
+        Billboard.StudsOffset = Vector3.new(0, 3, 0) -- Hiển thị trên đầu
+        Billboard.AlwaysOnTop = true
+        Billboard.Parent = character:WaitForChild("HumanoidRootPart")
 
-	local function Update()
-		local Connection
-		Connection = RunService.RenderStepped:Connect(function()
-			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
-				local RootPart = player.Character.HumanoidRootPart
-				local Head = player.Character:FindFirstChild("Head")
+        local TextLabel = Instance.new("TextLabel")
+        TextLabel.Size = UDim2.new(1, 0, 1, 0)
+        TextLabel.BackgroundTransparency = 1
+        TextLabel.TextStrokeTransparency = 0
+        TextLabel.Font = Enum.Font.SourceSansBold
+        TextLabel.TextSize = 14
+        TextLabel.Parent = Billboard
 
-				if Head then
-					local RootPos, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
-					local HeadPos = Camera:WorldToViewportPoint(Head.Position + Vector3.new(0, 0.6, 0))
-					local LegPos = Camera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3.3, 0))
+        -- Cập nhật logic liên tục
+        local Connection
+        Connection = RunService.RenderStepped:Connect(function()
+            if character and character.Parent and player.Parent then
+                local IsEnabled = ESP_SETTINGS.Enabled and player ~= LocalPlayer
+                Highlight.Enabled = IsEnabled
+                Billboard.Enabled = IsEnabled
 
-					if OnScreen and ESP_SETTINGS.Enabled then
-						-- 1. Cập nhật Khung (Box) áp sát
-						local BoxHeight = math.abs(HeadPos.Y - LegPos.Y)
-						local BoxWidth = BoxHeight / 1.8
+                if IsEnabled then
+                    -- Cập nhật màu theo Team
+                    local teamColor = player.TeamColor.Color
+                    Highlight.FillColor = teamColor
+                    Highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- Viền trắng cho rõ
+                    
+                    -- Cập nhật văn bản
+                    local dist = math.floor((LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (LocalPlayer.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude) or 0)
+                    TextLabel.Text = string.format("%s [%s]\n%d studs", player.Name, (player.Team and player.Team.Name or "No Team"), dist)
+                    TextLabel.TextColor3 = teamColor
+                end
+            else
+                Connection:Disconnect()
+            end
+        end)
+    end
 
-						Box.Size = Vector2.new(BoxWidth, BoxHeight)
-						Box.Position = Vector2.new(RootPos.X - BoxWidth / 2, RootPos.Y - BoxHeight / 2)
-						Box.Visible = true
-
-						-- 2. Xử lý Team & Màu sắc
-						local TeamName = player.Team and player.Team.Name or "No Team"
-						local TeamColor = player.TeamColor and player.TeamColor.Color or ESP_SETTINGS.DefaultTextColor
-
-						-- 3. Cập nhật Text (Tên | Team | Khoảng cách)
-						local Distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - RootPart.Position).Magnitude)
-						NameTag.Text = string.format("%s [%s]\n%d studs", player.Name, TeamName, Distance)
-						NameTag.Color = TeamColor -- Màu chữ theo màu Team
-						NameTag.Position = Vector2.new(RootPos.X, RootPos.Y - BoxHeight / 2 - 30)
-						NameTag.Visible = true
-					else
-						Box.Visible = false
-						NameTag.Visible = false
-					end
-				end
-			else
-				Box.Visible = false
-				NameTag.Visible = false
-				if not player.Parent then
-					Box:Remove()
-					NameTag:Remove()
-					Connection:Disconnect()
-				end
-			end
-		end)
-	end
-	coroutine.wrap(Update)()
+    if player.Character then ApplyESP(player.Character) end
+    player.CharacterAdded:Connect(ApplyESP)
 end
 
--- Khởi tạo ban đầu
-for _, player in pairs(Players:GetPlayers()) do
-	CreateESP(player)
-end
+-- Khởi tạo
+for _, p in pairs(Players:GetPlayers()) do CreateESP(p) end
 Players.PlayerAdded:Connect(CreateESP)
 
--- Điều khiển nút bấm từ GUI của bạn
+-- [[ KẾT NỐI VỚI NÚT BẤM CỦA BẠN ]]
 local ToggleBtn = _STORAGE["TextButton"]
 local IsOn = false
 
 ToggleBtn.MouseButton1Click:Connect(function()
-	IsOn = not IsOn
-	ESP_SETTINGS.Enabled = IsOn
-	ToggleBtn.Text = IsOn and "ESP: ON" or "ESP: OFF"
-	ToggleBtn.BackgroundColor3 = IsOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(0, 255, 255)
+    IsOn = not IsOn
+    ESP_SETTINGS.Enabled = IsOn
+    
+    ToggleBtn.Text = IsOn and "ESP: ON" or "ESP: OFF"
+    ToggleBtn.BackgroundColor3 = IsOn and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(0, 255, 255)
 end)
