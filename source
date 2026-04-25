@@ -68,7 +68,7 @@ local scripts = {
         Name = "DroneSimulatorFE.lua",
         Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/main/DroneSimulatorFE.lua",
         Description = "Create a Drone , enter drone to view drone's cam."
-    },
+    }
 }
 
 -- Create buttons for each script
