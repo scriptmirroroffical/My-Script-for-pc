@@ -47,7 +47,7 @@ local scripts = {
     {
         Name = "SM_EXECUTOR.lua",
         Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/SM_EXECUTOR.lua",
-        Description = "My first custom executor ,scanning backdoor feature is in Beta"
+        Description = "My first custom executor"
     },
     {
         Name = "SYSTEM_OPTIMIZER_PRO.lua",
@@ -55,15 +55,20 @@ local scripts = {
         Description = "Unlock FPS and boost your experience"
     },
     {
-        Name = "hitbox_extender.lua",
-        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/hitbox_extender.lua",
+        Name = "Hitbox_extender.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script-for-pc/main/Hitbox_extender.lua",
         Description = "Extend players' hitbox"
     },
     {
         Name = "Protector.luau",
         Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/main/Protector.luau",
         Description = "Protect you from malicious"
-    }
+    },
+    {
+        Name = "DroneSimulatorFE.lua",
+        Url = "https://raw.githubusercontent.com/scriptmirroroffical/My-Script/refs/heads/main/DroneSimulatorFE.lua",
+        Description = "Create a Drone , enter drone to view drone's cam."
+    },
 }
 
 -- Create buttons for each script
