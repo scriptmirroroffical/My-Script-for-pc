@@ -1,0 +1,119 @@
+-- [OMNI-SLEEP PRO: SELECTION EDITION]
+-- Author: son171020 | High-End Exploit UI
+-- Features: Instant Directional Buttons (FE)
+
+local lp = game:GetService("Players").LocalPlayer
+local char = lp.Character or lp.CharacterAdded:Wait()
+local lying = false
+
+-- --- PROFESSIONAL UI SETUP ---
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "OmniSleep_Selection"
+ScreenGui.Parent = game:GetService("CoreGui") -- Using CoreGui to persist
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 250, 0, 180)
+MainFrame.Position = UDim2.new(0.5, -125, 0.75, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner_Main = Instance.new("UICorner", MainFrame)
+local UIStroke_Main = Instance.new("UIStroke", MainFrame)
+UIStroke_Main.Color = Color3.fromRGB(0, 255, 127)
+UIStroke_Main.Thickness = 2
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Text = "OMNI-SLEEP PRO v3"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+-- --- BUTTON GRID LAYOUT ---
+local GridFrame = Instance.new("Frame")
+GridFrame.Size = UDim2.new(0.9, 0, 0.45, 0)
+GridFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+GridFrame.BackgroundTransparency = 1
+GridFrame.Parent = MainFrame
+
+local UIGrid = Instance.new("UIGridLayout", GridFrame)
+UIGrid.CellSize = UDim2.new(0, 105, 0, 35)
+UIGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- --- FUNCTIONAL LOGIC ---
+local function applySleep(rotation)
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return end
+    
+    -- Reset first to avoid stacking rotations
+    hum.PlatformStand = false
+    hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
+    
+    task.wait(0.05) -- Small delay for stability
+    
+    hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+    hum.PlatformStand = true
+    root.CFrame = root.CFrame * rotation
+    lying = true
+end
+
+local function standUp()
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return end
+    
+    hum.PlatformStand = false
+    hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
+    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+    lying = false
+end
+
+-- --- BUTTON CREATOR ---
+local function createButton(name, rotation, color)
+    local btn = Instance.new("TextButton")
+    btn.Text = name
+    btn.BackgroundColor3 = color or Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 12
+    btn.BorderSizePixel = 0
+    btn.Parent = GridFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    btn.MouseButton1Click:Connect(function()
+        applySleep(rotation)
+    end)
+end
+
+-- Create the 4 directions
+createButton("FRONT (Lie)", CFrame.Angles(math.rad(-90), 0, 0))
+createButton("BACK (Rest)", CFrame.Angles(math.rad(90), 0, 0))
+createButton("LEFT (Side)", CFrame.Angles(0, 0, math.rad(90)))
+createButton("RIGHT (Side)", CFrame.Angles(0, 0, math.rad(-90)))
+
+-- --- RESET BUTTON ---
+local ResetBtn = Instance.new("TextButton")
+ResetBtn.Size = UDim2.new(0.9, 0, 0, 35)
+ResetBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
+ResetBtn.Text = "WAKE UP / STAND"
+ResetBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ResetBtn.TextColor3 = Color3.new(1, 1, 1)
+ResetBtn.Font = Enum.Font.GothamBold
+ResetBtn.TextSize = 13
+ResetBtn.Parent = MainFrame
+Instance.new("UICorner", ResetBtn).CornerRadius = UDim.new(0, 6)
+
+ResetBtn.MouseButton1Click:Connect(standUp)
+
+-- Character Auto-refresh
+lp.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    lying = false
+end)
