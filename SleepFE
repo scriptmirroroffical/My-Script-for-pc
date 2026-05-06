@@ -24,7 +24,7 @@ UIStroke_Main.Thickness = 2
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
-Title.Text = "Sleep FE by ItsMynaXa"
+Title.Text = "Sleep FE by ItsMynaX"
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
